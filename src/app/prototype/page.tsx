@@ -562,12 +562,76 @@ function LaporanView({ prs, kontraks, tagihans }: any) {
   const totalKontrak = kontraks.reduce((s:number,k:Kontrak) => s+k.nilai, 0);
   const totalTagihan = tagihans.reduce((s:number,t:Tagihan) => s+t.nominal, 0);
   const dist = prs.reduce((a:any,p:Permintaan) => { a[p.status]=(a[p.status]||0)+1; return a; }, {});
-  const downloadPDF = (pr:Permintaan) => {
-    const relatedK = kontraks.filter((k:Kontrak) => true); // show all for prototype
+  const downloadPDF = async (pr:Permintaan) => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
+    const doc = new jsPDF();
+    const relatedK = kontraks.filter((k:Kontrak) => true);
     const relatedT = tagihans.filter((t:Tagihan) => true);
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Laporan ${pr.id}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;padding:40px;color:#1a1a1a;font-size:13px}h1{font-size:18px;margin-bottom:4px}h2{font-size:14px;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}.info{color:#555;margin-bottom:16px}.info span{margin-right:20px}table{width:100%;border-collapse:collapse;margin-bottom:16px}th,td{border:1px solid #ddd;padding:6px 10px;text-align:left;font-size:12px}th{background:#f5f5f5;font-weight:600}.footer{margin-top:40px;color:#888;font-size:11px;border-top:1px solid #eee;padding-top:8px}</style></head><body><h1>LAPORAN PENGAJUAN — ${pr.id}</h1><div class="info"><span>Unit: <b>${pr.unit}</b></span><span>Tanggal: <b>${pr.tgl}</b></span><span>Status: <b>${pr.status}</b></span></div><h2>Daftar Barang</h2><table><thead><tr><th>No</th><th>Nama Barang</th><th>Jumlah</th><th>Satuan</th></tr></thead><tbody>${pr.items.map((it,idx)=>`<tr><td>${idx+1}</td><td>${it.namaBarang}</td><td>${it.jumlah}</td><td>${it.satuan}</td></tr>`).join("")}</tbody></table>${relatedK.length>0?`<h2>Kontrak Terkait</h2><table><thead><tr><th>No Kontrak</th><th>Supplier</th><th>Nilai</th><th>Status</th></tr></thead><tbody>${relatedK.map((k:Kontrak)=>`<tr><td>${k.noKontrak}</td><td>${k.supplier}</td><td>${fmt(k.nilai)}</td><td>${k.status}</td></tr>`).join("")}</tbody></table>`:""}${relatedT.length>0?`<h2>Tagihan Terkait</h2><table><thead><tr><th>No Tagihan</th><th>Supplier</th><th>Nominal</th><th>Tanggal</th></tr></thead><tbody>${relatedT.map((t:Tagihan)=>`<tr><td>${t.noTagihan}</td><td>${t.supplier}</td><td>${fmt(t.nominal)}</td><td>${t.tgl}</td></tr>`).join("")}</tbody></table>`:""}<div class="footer">Generated: ${new Date().toLocaleString("id-ID")}</div></body></html>`;
-    const w = window.open("","_blank");
-    if(w) { w.document.write(html); w.document.close(); }
+    // Header
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(`LAPORAN PENGAJUAN - ${pr.id}`, 14, 20);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Unit: ${pr.unit}    |    Tanggal: ${pr.tgl}    |    Status: ${pr.status}`, 14, 28);
+    doc.setDrawColor(200);
+    doc.line(14, 32, 196, 32);
+    // Items table
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Daftar Barang", 14, 40);
+    autoTable(doc, {
+      startY: 44,
+      head: [["No", "Nama Barang", "Jumlah", "Satuan"]],
+      body: pr.items.map((it,idx) => [String(idx+1), it.namaBarang, String(it.jumlah), it.satuan]),
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [24,24,27], textColor: 255 },
+      margin: { left: 14 },
+    });
+    let y = (doc as any).lastAutoTable?.finalY || 60;
+    // Kontrak terkait
+    if (relatedK.length > 0) {
+      y += 10;
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Kontrak Terkait", 14, y);
+      y += 4;
+      autoTable(doc, {
+        startY: y,
+        head: [["No Kontrak", "Supplier", "Nilai", "Status"]],
+        body: relatedK.map((k:Kontrak) => [k.noKontrak, k.supplier, fmt(k.nilai), k.status]),
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [24,24,27], textColor: 255 },
+        margin: { left: 14 },
+      });
+      y = (doc as any).lastAutoTable?.finalY || y + 20;
+    }
+    // Tagihan terkait
+    if (relatedT.length > 0) {
+      y += 10;
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Tagihan Terkait", 14, y);
+      y += 4;
+      autoTable(doc, {
+        startY: y,
+        head: [["No Tagihan", "Supplier", "Nominal", "Tanggal"]],
+        body: relatedT.map((t:Tagihan) => [t.noTagihan, t.supplier, fmt(t.nominal), t.tgl]),
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [24,24,27], textColor: 255 },
+        margin: { left: 14 },
+      });
+    }
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(`Generated: ${new Date().toLocaleString("id-ID")}  |  Page ${i}/${pageCount}`, 14, 290);
+    }
+    doc.save(`Laporan_${pr.id}.pdf`);
   };
   return (
     <div>
