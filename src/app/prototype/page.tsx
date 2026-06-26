@@ -183,9 +183,9 @@ export default function PrototypePage() {
             selected={selected} setSelected={setSelected} alasan={alasan} setAlasan={setAlasan}
           />}
           {view === "Kontrak" && <KontrakView prs={prs} kontraks={kontraks}
-            buatKontrak={(p:Permintaan) => {
-              const nk={ id:`KTR-${String(kontraks.length+9).padStart(3,"0")}`, noKontrak:`KTR-${String(kontraks.length+9).padStart(3,"0")}/VI/2026`, supplier:"Supplier Baru", nilai:150000000,
-                termin:[{id:1,tgl:"15 Jul 2026",persentase:40,nominal:60000000,status:"Belum" as const},{id:2,tgl:"15 Agu 2026",persentase:60,nominal:90000000,status:"Belum" as const}],
+            buatKontrak={(p:Permintaan, supplier:string, nilai:number, termin:{tgl:string,persentase:number}[]) => {
+              const nk={ id:`KTR-${String(kontraks.length+9).padStart(3,"0")}`, noKontrak:`KTR-${String(kontraks.length+9).padStart(3,"0")}/VI/2026`, supplier, nilai,
+                termin:termin.map((t,i)=>({id:i+1,tgl:t.tgl,persentase:t.persentase,nominal:Math.round(nilai*t.persentase/100),status:"Belum" as const})),
                 status:"Menunggu PO" as StatusKontrak, buktiPO:false };
               setKontraks([nk,...kontraks]); setPrs(prs.map(x=>x.id===p.id?{...x,status:"Kontrak Dibuat"}:x));
               addNotif(`Kontrak ${nk.noKontrak} dibuat, perlu kirim Draft PO`,"PO & Receipt"); setShowNotifSuccess("Kontrak dibuat"); setTimeout(()=>setShowNotifSuccess(""),2000);
@@ -203,7 +203,14 @@ export default function PrototypePage() {
             kirimBarang={(k:Kontrak) => { setKontraks(kontraks.map(x=>x.id===k.id?{...x,status:"Menunggu Barang"}:x)); addNotif(`Barang dari ${k.supplier} sedang dikirim`); setShowNotifSuccess("Barang dikirim"); setTimeout(()=>setShowNotifSuccess(""),2000); }}
             kirimTagihan={(k:Kontrak) => { const nt={ id:`TAG-${String(tagihans.length+13).padStart(3,"0")}`, noTagihan:`INV-2026-${String(tagihans.length+13).padStart(3,"0")}`, supplier:k.supplier, kontrakId:k.id, tgl:new Date().toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}), nominal:k.termin.find(t=>t.status==="Belum")?.nominal||k.nilai, berkas:true }; setTagihans([nt,...tagihans]); addNotif(`Tagihan ${nt.noTagihan} dari ${k.supplier}`,"Tagihan"); setShowNotifSuccess("Tagihan dikirim"); setTimeout(()=>setShowNotifSuccess(""),2000); }}
           />}
-          {view === "Tagihan" && <TagihanView tagihans={tagihans} kontraks={kontraks} />}
+          {view === "Tagihan" && <TagihanView tagihans={tagihans} kontraks={kontraks}
+            addTagihan={(kontrakId:string, nominal:number, berkasName?:string) => {
+              const k=kontraks.find(x=>x.id===kontrakId);
+              if(!k) return;
+              const nt={ id:`TAG-${String(tagihans.length+13).padStart(3,"0")}`, noTagihan:`INV-2026-${String(tagihans.length+13).padStart(3,"0")}`, supplier:k.supplier, kontrakId, tgl:new Date().toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}), nominal, berkas:true, berkasName:berkasName||"invoice.pdf" };
+              setTagihans([nt,...tagihans]); addNotif(`Tagihan ${nt.noTagihan} dari ${k.supplier}`,"Tagihan"); setShowNotifSuccess("Tagihan disimpan"); setTimeout(()=>setShowNotifSuccess(""),2000);
+            }}
+          />}
           {view === "Pembayaran" && <PembayaranView kontraks={kontraks}
             bayar={(k:Kontrak,tid:number) => { setKontraks(kontraks.map(x=>x.id===k.id?{...x,termin:x.termin.map(t=>t.id===tid?{...t,status:"Dibayar" as const}:t)}:x)); addNotif(`Termin ${tid} ${k.noKontrak} dibayar`); setShowNotifSuccess("Pembayaran berhasil"); setTimeout(()=>setShowNotifSuccess(""),2000); }}
           />}
@@ -326,9 +333,41 @@ function ValidasiView({ prs, role, approve, reject, verifyAnggaran, selected, se
    ═══════════════════════════════════════════════ */
 function KontrakView({ prs, kontraks, buatKontrak }: any) {
   const ready = prs.filter((p:Permintaan) => p.status === "Anggaran Tersedia");
+  const [formFor, setFormFor] = useState<string|null>(null);
+  const [supplier, setSupplier] = useState("");
+  const [nilai, setNilai] = useState(0);
+  const [termins, setTermins] = useState<{tgl:string,persentase:number}[]>([{tgl:"",persentase:50}]);
   return (
     <div>
-      {ready.length > 0 && <div className="mb-10"><h2 className="mb-4 text-lg font-semibold tracking-tight">Siap Dibuat Kontrak</h2><div className="grid gap-4 sm:grid-cols-2">{ready.map((pr:Permintaan) => <div key={pr.id} className="rounded-xl border border-zinc-200 bg-white p-5"><p className="font-mono text-xs text-zinc-400">{pr.id}</p><p className="font-semibold text-zinc-800">{pr.unit}</p><div className="my-2 space-y-0.5 text-sm text-zinc-600">{pr.items.map((i:PermintaanItem,idx:number)=><p key={idx}>{i.namaBarang} ×{i.jumlah}</p>)}</div><button onClick={() => buatKontrak(pr)} className="rounded-lg bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-zinc-800">+ Buat Kontrak</button></div>)}</div></div>}
+      {ready.length > 0 && <div className="mb-10"><h2 className="mb-4 text-lg font-semibold tracking-tight">Siap Dibuat Kontrak</h2><div className="space-y-4">{ready.map((pr:Permintaan) => (
+        <div key={pr.id} className="rounded-xl border border-zinc-200 bg-white p-5">
+          <p className="font-mono text-xs text-zinc-400">{pr.id}</p><p className="font-semibold text-zinc-800">{pr.unit}</p>
+          <div className="my-2 space-y-0.5 text-sm text-zinc-600">{pr.items.map((i:PermintaanItem,idx:number)=><p key={idx}>{i.namaBarang} ×{i.jumlah}</p>)}</div>
+          {formFor !== pr.id && <button onClick={() => { setFormFor(pr.id); setSupplier(""); setNilai(0); setTermins([{tgl:"",persentase:50}]); }} className="rounded-lg bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-zinc-800">+ Buat Kontrak</button>}
+          {formFor === pr.id && (
+            <div className="mt-3 space-y-3 border-t border-zinc-100 pt-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div><label className="mb-1 block text-xs text-zinc-500">Nama Supplier</label><input value={supplier} onChange={e=>setSupplier(e.target.value)} className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm" placeholder="PT ..." /></div>
+                <div><label className="mb-1 block text-xs text-zinc-500">Nilai Kontrak</label><input type="number" value={nilai||""} onChange={e=>setNilai(Number(e.target.value))} className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm" placeholder="150000000" /></div>
+              </div>
+              <div><p className="mb-2 text-xs font-medium text-zinc-500">Termin Pembayaran</p>
+                {termins.map((t,i) => <div key={i} className="mb-2 flex items-center gap-2 text-xs">
+                  <input value={t.tgl} onChange={e=>{const c=[...termins]; c[i]={...c[i],tgl:e.target.value}; setTermins(c);}} placeholder="Tanggal" className="w-32 rounded-md border border-zinc-200 px-2 py-1.5 text-xs" />
+                  <input type="number" value={t.persentase||""} onChange={e=>{const c=[...termins]; c[i]={...c[i],persentase:Number(e.target.value)}; setTermins(c);}} className="w-20 rounded-md border border-zinc-200 px-2 py-1.5 text-xs" placeholder="%" />
+                  <span className="text-zinc-400">%</span>
+                  <span className="text-zinc-500">= {fmt(Math.round(nilai*t.persentase/100))}</span>
+                  {termins.length>1 && <button onClick={()=>setTermins(termins.filter((_,j)=>j!==i))} className="text-red-400 hover:text-red-600">✕</button>}
+                </div>)}
+                <button onClick={()=>setTermins([...termins,{tgl:"",persentase:0}])} className="text-xs font-medium text-blue-600 hover:underline">+ Tambah Termin</button>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { if(supplier.trim()&&nilai>0) { buatKontrak(pr,supplier,nilai,termins); setFormFor(null); }}} className="rounded-lg bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-zinc-800">Buat Kontrak</button>
+                <button onClick={() => setFormFor(null)} className="rounded-lg border border-zinc-200 px-4 py-2 text-xs text-zinc-600 hover:bg-zinc-50">Batal</button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}</div></div>}
       <h2 className="mb-4 text-lg font-semibold tracking-tight">Daftar Kontrak</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {kontraks.map((k:Kontrak) => <div key={k.id} className="rounded-xl border border-zinc-200 bg-white p-5">
@@ -451,21 +490,42 @@ function SupplierKirimView({ kontraks, tagihans, kirimBarang, kirimTagihan }: an
 /* ═══════════════════════════════════════════════
    TAGIHAN (UC10 + UC11)
    ═══════════════════════════════════════════════ */
-function TagihanView({ tagihans }: any) {
+function TagihanView({ tagihans, kontraks, addTagihan }: any) {
+  const [showForm, setShowForm] = useState(false);
+  const [fkId, setFkId] = useState("");
+  const [nom, setNom] = useState(0);
+  const [berkasName, setBerkasName] = useState("");
   return (
     <div>
-      <h2 className="mb-4 text-lg font-semibold tracking-tight">Daftar Tagihan</h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-semibold tracking-tight">Daftar Tagihan</h2>
+        {!showForm && <button onClick={() => { setShowForm(true); setFkId(kontraks[0]?.id||""); setNom(0); setBerkasName(""); }} className="rounded-lg bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-zinc-800">+ Input Tagihan Baru</button>}
+      </div>
+      {showForm && (
+        <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-5">
+          <h3 className="mb-3 text-sm font-semibold">Input Tagihan Baru</h3>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div><label className="mb-1 block text-xs text-zinc-500">Pilih Kontrak</label><select value={fkId} onChange={e=>setFkId(e.target.value)} className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm">{kontraks.map((k:Kontrak)=><option key={k.id} value={k.id}>{k.noKontrak} — {k.supplier}</option>)}</select></div>
+            <div><label className="mb-1 block text-xs text-zinc-500">Nominal Tagihan</label><input type="number" value={nom||""} onChange={e=>setNom(Number(e.target.value))} className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm" placeholder="50000000" /></div>
+            <div><label className="mb-1 block text-xs text-zinc-500">Upload Berkas</label><label className="flex cursor-pointer items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm text-zinc-500 hover:border-zinc-300"><span className="truncate">{berkasName || "📎 Pilih file..."}</span><input type="file" className="hidden" accept=".pdf,.jpg,.png" onChange={e=>{const f=e.target.files?.[0]; if(f) setBerkasName(f.name);}} /></label></div>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button onClick={() => { if(fkId&&nom>0) { addTagihan(fkId,nom,berkasName||undefined); setShowForm(false); }}} className="rounded-lg bg-zinc-900 px-4 py-2 text-xs font-medium text-white hover:bg-zinc-800">Simpan Tagihan</button>
+            <button onClick={() => setShowForm(false)} className="rounded-lg border border-zinc-200 px-4 py-2 text-xs text-zinc-600 hover:bg-zinc-50">Batal</button>
+          </div>
+        </div>
+      )}
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
         <table className="w-full text-left text-sm"><thead><tr className="border-b border-zinc-100 bg-zinc-50/50">
           {["No Tagihan","Supplier","Kontrak","Tanggal","Nominal","Berkas"].map(h=><th key={h} className="px-5 py-3 text-xs font-medium uppercase tracking-wider text-zinc-400">{h}</th>)}
         </tr></thead><tbody>
-          {tagihans.map((t:Tagihan) => <tr key={t.id} className="border-b border-zinc-50 hover:bg-zinc-50/50">
+          {tagihans.map((t:any) => <tr key={t.id} className="border-b border-zinc-50 hover:bg-zinc-50/50">
             <td className="px-5 py-3 font-mono text-xs font-medium text-zinc-700">{t.noTagihan}</td>
             <td className="px-5 py-3 text-zinc-700">{t.supplier}</td>
             <td className="px-5 py-3 font-mono text-xs text-zinc-500">{t.kontrakId}</td>
             <td className="px-5 py-3 text-zinc-500">{t.tgl}</td>
             <td className="px-5 py-3 font-medium text-zinc-700">{fmt(t.nominal)}</td>
-            <td className="px-5 py-3"><span className="text-xs text-zinc-400">{t.berkas ? "📎 invoice.pdf" : "❌ Belum upload"}</span></td>
+            <td className="px-5 py-3"><span className="text-xs text-zinc-400">{t.berkas ? `📎 ${t.berkasName||"invoice.pdf"}` : "❌ Belum upload"}</span></td>
           </tr>)}
         </tbody></table>
       </div>
@@ -502,6 +562,13 @@ function LaporanView({ prs, kontraks, tagihans }: any) {
   const totalKontrak = kontraks.reduce((s:number,k:Kontrak) => s+k.nilai, 0);
   const totalTagihan = tagihans.reduce((s:number,t:Tagihan) => s+t.nominal, 0);
   const dist = prs.reduce((a:any,p:Permintaan) => { a[p.status]=(a[p.status]||0)+1; return a; }, {});
+  const downloadPDF = (pr:Permintaan) => {
+    const relatedK = kontraks.filter((k:Kontrak) => true); // show all for prototype
+    const relatedT = tagihans.filter((t:Tagihan) => true);
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Laporan ${pr.id}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;padding:40px;color:#1a1a1a;font-size:13px}h1{font-size:18px;margin-bottom:4px}h2{font-size:14px;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}.info{color:#555;margin-bottom:16px}.info span{margin-right:20px}table{width:100%;border-collapse:collapse;margin-bottom:16px}th,td{border:1px solid #ddd;padding:6px 10px;text-align:left;font-size:12px}th{background:#f5f5f5;font-weight:600}.footer{margin-top:40px;color:#888;font-size:11px;border-top:1px solid #eee;padding-top:8px}</style></head><body><h1>LAPORAN PENGAJUAN — ${pr.id}</h1><div class="info"><span>Unit: <b>${pr.unit}</b></span><span>Tanggal: <b>${pr.tgl}</b></span><span>Status: <b>${pr.status}</b></span></div><h2>Daftar Barang</h2><table><thead><tr><th>No</th><th>Nama Barang</th><th>Jumlah</th><th>Satuan</th></tr></thead><tbody>${pr.items.map((it,idx)=>`<tr><td>${idx+1}</td><td>${it.namaBarang}</td><td>${it.jumlah}</td><td>${it.satuan}</td></tr>`).join("")}</tbody></table>${relatedK.length>0?`<h2>Kontrak Terkait</h2><table><thead><tr><th>No Kontrak</th><th>Supplier</th><th>Nilai</th><th>Status</th></tr></thead><tbody>${relatedK.map((k:Kontrak)=>`<tr><td>${k.noKontrak}</td><td>${k.supplier}</td><td>${fmt(k.nilai)}</td><td>${k.status}</td></tr>`).join("")}</tbody></table>`:""}${relatedT.length>0?`<h2>Tagihan Terkait</h2><table><thead><tr><th>No Tagihan</th><th>Supplier</th><th>Nominal</th><th>Tanggal</th></tr></thead><tbody>${relatedT.map((t:Tagihan)=>`<tr><td>${t.noTagihan}</td><td>${t.supplier}</td><td>${fmt(t.nominal)}</td><td>${t.tgl}</td></tr>`).join("")}</tbody></table>`:""}<div class="footer">Generated: ${new Date().toLocaleString("id-ID")}</div></body></html>`;
+    const w = window.open("","_blank");
+    if(w) { w.document.write(html); w.document.close(); }
+  };
   return (
     <div>
       <div className="mb-10 grid gap-6 sm:grid-cols-4">
@@ -510,11 +577,24 @@ function LaporanView({ prs, kontraks, tagihans }: any) {
         )}
       </div>
       <h2 className="mb-4 text-lg font-semibold tracking-tight">Distribusi Status Permintaan</h2>
-      <div className="space-y-2">
+      <div className="mb-10 space-y-2">
         {Object.entries(dist).map(([status, count]:any) => <div key={status} className="flex items-center gap-3">
           <span className={`w-48 shrink-0 rounded-full px-2 py-0.5 text-center text-xs font-medium ${SC[status as StatusPermintaan]||"bg-zinc-100 text-zinc-600"}`}>{status}</span>
           <div className="h-2 flex-1 rounded-full bg-zinc-100"><div className="h-2 rounded-full bg-zinc-400" style={{width:`${(count/prs.length)*100}%`}} /></div>
           <span className="w-6 text-right text-xs text-zinc-500">{count}</span>
+        </div>)}
+      </div>
+      <h2 className="mb-4 text-lg font-semibold tracking-tight">Detail Per Pengajuan</h2>
+      <div className="space-y-3">
+        {prs.map((pr:Permintaan) => <div key={pr.id} className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-5 py-4">
+          <div>
+            <p className="font-mono text-xs text-zinc-400">{pr.id} <span className="font-sans text-zinc-600">— {pr.unit} — {pr.tgl}</span></p>
+            <p className="text-sm text-zinc-600">{pr.items.map(i=>i.namaBarang).join(", ")}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${SC[pr.status]}`}>{pr.status}</span>
+            <button onClick={() => downloadPDF(pr)} className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800">Download PDF</button>
+          </div>
         </div>)}
       </div>
     </div>
