@@ -1,65 +1,579 @@
-import Image from "next/image";
+import MermaidDiagram from "@/components/MermaidDiagram";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="mx-auto max-w-3xl px-6 py-24 sm:py-32">
+      {/* ───── HERO ───── */}
+      <header className="mb-32">
+        <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-zinc-400">
+          Technical Test
+        </p>
+        <h1 className="mb-4 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+          System Analyst
+        </h1>
+        <p className="mb-8 text-lg leading-relaxed text-zinc-500">
+          Case: Sistem Informasi Pengadaan Barang
+          <br />
+          PT Aksa Digital Group
+        </p>
+        <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-zinc-400">
+          <span>
+            <strong className="font-medium text-zinc-600">Kandidat</strong>{" "}
+            Ridha Fahmi Junaidi
+          </span>
+          <span>
+            <strong className="font-medium text-zinc-600">Tanggal</strong> 25
+            Juni 2026
+          </span>
+        </div>
+        <a
+          href="/api/download"
+          className="mt-8 inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Jawaban (.docx)
+        </a>
+      </header>
+
+      {/* ════════════════════════════════════════ */}
+      {/* ───── SECTION 1 ───── */}
+      {/* ════════════════════════════════════════ */}
+      <Section number="1" title="Analisis Kebutuhan Sistem" points={50}>
+        {/* 1.1 Use Case */}
+        <Subsection title="1.1 Spesifikasi Kebutuhan Pengguna (Use Case)">
+          <p className="mb-6 leading-relaxed text-zinc-600">
+            Tujuh aktor teridentifikasi dalam sistem pengadaan barang — 6 aktor internal
+            (Unit Pemohon, Procurement, Budgeting, Keuangan, Kasir, Manager) dan 1 secondary actor
+            (Supplier). Interaksi Supplier bersifat offline, dicatat/diinput oleh Procurement.
           </p>
+          <MermaidDiagram
+            chart={`graph LR
+    UP["🏢 Unit Pemohon"]
+    PP["📋 Procurement"]
+    PB["💰 Budgeting"]
+    PK["📊 Keuangan"]
+    KS["🏦 Kasir"]
+    MG["📈 Manager"]
+    SP[("🚚 Supplier<br/><i>Secondary Actor</i>")]
+
+    UP --> UC1(("Mengajukan<br/>Permintaan"))
+    UP --> UC2(("Terima<br/>Notifikasi"))
+
+    PP --> UC3(("Validasi<br/>Permintaan"))
+    PP --> UC4(("Kirim Draft<br/>PO ke Vendor"))
+    PP --> UC5(("Input<br/>Kontrak"))
+    PP --> UC6(("Input Termin<br/>Pembayaran"))
+    PP --> UC7(("Upload<br/>Bukti PO"))
+    PP --> UC8(("Terima Barang<br/>& Tagihan"))
+
+    PB --> UC9(("Verifikasi<br/>Anggaran"))
+    PB --> UC2
+
+    PK --> UC10(("Input Data<br/>Tagihan"))
+    PK --> UC11(("Upload Berkas<br/>Tagihan"))
+
+    KS --> UC12(("Cairkan Dana<br/>Pembayaran"))
+
+    MG --> UC13(("Generate<br/>Laporan"))
+
+    PP -.->|"PO offline"| SP
+    SP -.->|"Barang + Tagihan"| PP`}
+          />
+          <p className="mt-6 text-sm text-zinc-400 text-center">
+            Use Case Diagram — 7 aktor, 15 use case
+          </p>
+        </Subsection>
+
+        {/* 1.2 Flow + Functional */}
+        <Subsection title="1.2 Flow Diagram & Kebutuhan Fungsional">
+          <p className="mb-6 leading-relaxed text-zinc-600">
+            Alur proses bisnis pengadaan barang dari permintaan hingga
+            pembayaran, melibatkan 6 aktor internal dan 1 eksternal.
+          </p>
+
+          <h4 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            Alur Bisnis — Swimlane
+          </h4>
+          <MermaidDiagram
+            chart={`sequenceDiagram
+    actor UP as Unit Pemohon
+    actor PP as Procurement
+    actor PB as Budgeting
+    actor PK as Keuangan
+    actor KS as Kasir
+    actor SP as Supplier
+
+    UP->>PP: 1. Ajukan Permintaan Barang
+    Note right of PP: tgl, nama barang, jumlah
+    
+    PP->>PP: 2. Validasi Kebutuhan
+    
+    alt Ditolak
+        PP-->>UP: Notifikasi Penolakan
+    else Disetujui
+        PP->>PB: 3. Verifikasi Anggaran
+        PB->>PB: Cek Ketersediaan Budget
+        
+        alt Anggaran Habis
+            PB-->>UP: Notifikasi Budget Tidak Cukup
+        else Anggaran Tersedia
+            PB-->>PP: Budget OK
+            PP->>SP: 4. Kirim Draft PO
+            SP-->>PP: 5. Kirim PO Resmi
+            
+            PP->>PP: 6. Input Kontrak & Termin
+            Note right of PP: no kontrak, harga, termin
+            
+            PP->>PP: 7. Upload Bukti PO
+            
+            SP->>PP: 8. Kirim Barang + Tagihan
+            PP->>PK: 9. Teruskan Tagihan
+            
+            PK->>PK: 10. Input Data Tagihan
+            PK->>PK: 11. Upload Berkas
+            
+            PK->>KS: 12. Notifikasi Pencairan
+            KS->>KS: 13. Input Pembayaran
+            Note right of KS: tgl bayar, nominal, total
+            
+            PP->>PP: 14. Generate Laporan
+        end
+    end`}
+          />
+          <p className="mt-2 text-sm text-zinc-400 text-center">
+            Sequence Diagram — 14 langkah alur pengadaan
+          </p>
+
+          <h4 className="mb-4 mt-10 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            11 Kebutuhan Fungsional
+          </h4>
+          <Table
+            headers={["ID", "Fungsi", "Deskripsi", "Aktor"]}
+            rows={[
+              ["F-01", "Manajemen Permintaan", "CRUD permintaan barang (multi-item)", "Unit Pemohon"],
+              ["F-02", "Validasi Procurement", "Approve/reject dengan alasan", "Procurement"],
+              ["F-03", "Verifikasi Anggaran", "Cek ketersediaan budget unit", "Budgeting"],
+              ["F-04", "Notifikasi", "Push notifikasi real-time", "Sistem"],
+              ["F-05", "Manajemen Kontrak", "Input kontrak, PO, harga", "Procurement"],
+              ["F-06", "Manajemen Termin", "Pembayaran bertahap (multi-termin)", "Procurement"],
+              ["F-07", "Upload Dokumen", "Scan PO & berkas tagihan", "Proc, Keuangan"],
+              ["F-08", "Manajemen Tagihan", "Input data tagihan supplier", "Keuangan"],
+              ["F-09", "Pencairan Dana", "Input pembayaran final", "Kasir"],
+              ["F-10", "Generate Laporan", "Harian/mingguan/bulanan/tahunan", "Manager"],
+              ["F-11", "Auth & Otorisasi", "Login + role-based access control", "Semua"],
+            ]}
+          />
+        </Subsection>
+
+        {/* 1.3 ERD */}
+        <Subsection title="1.3 Entity Relationship Diagram (ERD)">
+          <p className="mb-6 leading-relaxed text-zinc-600">
+            14 entitas dengan relasi 1:N dan 1:1. PEMBAYARAN terhubung ke TERMIN_PEMBAYARAN
+            via id_termin untuk trace realisasi pembayaran per termin pencairan dana.
+          </p>
+          <MermaidDiagram
+            chart={`erDiagram
+    UNIT_PEMOHON ||--o{ PERMINTAAN : mengajukan
+    PERMINTAAN ||--o{ DETAIL_PERMINTAAN : "multi barang"
+    PERMINTAAN ||--|| VALIDASI_PROCUREMENT : divalidasi
+    VALIDASI_PROCUREMENT ||--|| VERIFIKASI_ANGGARAN : diteruskan
+    PERMINTAAN ||--o{ NOTIFIKASI : menghasilkan
+
+    PERMINTAAN ||--o{ KONTRAK : menghasilkan
+    KONTRAK ||--o{ DETAIL_KONTRAK : "multi barang"
+    KONTRAK ||--o{ TERMIN_PEMBAYARAN : "multi termin"
+
+    KONTRAK ||--o{ TAGIHAN : ditagihkan
+    TAGIHAN ||--o{ DETAIL_TAGIHAN : "multi barang"
+    TAGIHAN ||--o{ PEMBAYARAN : dilunasi
+    TERMIN_PEMBAYARAN ||--o{ PEMBAYARAN : "realisasi termin"
+
+    SUPPLIER ||--o{ KONTRAK : menyediakan
+    SUPPLIER ||--o{ TAGIHAN : mengirimkan
+
+    USER ||--o{ PERMINTAAN : membuat
+    USER ||--o{ NOTIFIKASI : menerima
+
+    UNIT_PEMOHON {
+        int id_unit PK
+        string nama_unit
+        string kode
+    }
+    PERMINTAAN {
+        int id_permintaan PK
+        int id_unit FK
+        date tgl_pengajuan
+        enum status
+    }
+    DETAIL_PERMINTAAN {
+        int id_detail PK
+        int id_permintaan FK
+        string nama_barang
+        int jumlah
+        string satuan
+    }
+    KONTRAK {
+        int id_kontrak PK
+        int id_permintaan FK
+        int id_supplier FK
+        string no_kontrak
+        date tgl_kontrak
+    }
+    TERMIN_PEMBAYARAN {
+        int id_termin PK
+        int id_kontrak FK
+        date tgl_pembayaran
+        decimal persentase
+        decimal nominal
+    }
+    TAGIHAN {
+        int id_tagihan PK
+        int id_kontrak FK
+        date tgl_tagihan
+        string no_tagihan
+    }
+    PEMBAYARAN {
+        int id_pembayaran PK
+        int id_tagihan FK
+        int id_termin FK
+        date tgl_pembayaran
+        decimal nominal
+        decimal total
+    }
+    SUPPLIER {
+        int id_supplier PK
+        string nama
+        string npwp
+    }
+    USER {
+        int id_user PK
+        string username
+        enum role
+    }`}
+          />
+          <p className="mt-2 text-sm text-zinc-400 text-center">
+            ERD — 14 entitas dengan relasi dan atribut kunci
+          </p>
+
+          <h4 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            Relasi Kunci
+          </h4>
+          <div className="space-y-1 text-sm text-zinc-500">
+            <p>• Unit Pemohon 1→N Permintaan → Detail Permintaan</p>
+            <p>• Permintaan 1→1 Validasi → 1 Verifikasi Anggaran</p>
+            <p>• Permintaan 1→1 Kontrak → Detail Kontrak & Termin</p>
+            <p>• Kontrak 1→N Tagihan → Detail Tagihan</p>
+            <p>• Tagihan 1→N Pembayaran → Termin Pembayaran (trace per termin)</p>
+            <p>• Supplier 1→N Kontrak, 1→N Tagihan</p>
+          </div>
+        </Subsection>
+
+        {/* 1.4 UML — Activity Diagram */}
+        <Subsection title="1.4 Activity Diagram">
+          <p className="mb-6 leading-relaxed text-zinc-600">
+            Activity diagram menggambarkan alur proses permintaan barang dengan
+            decision point di setiap tahap validasi.
+          </p>
+          <MermaidDiagram
+            chart={`graph TD
+    START([Start]) --> A
+
+    A[Unit Pemohon:<br/>Input Permintaan Barang] --> B
+
+    B{Procurement:<br/>Validasi Kebutuhan?}
+    B -->|Ditolak| C[Notifikasi<br/>Penolakan ke Pemohon]
+    C --> END1([End])
+    B -->|Disetujui| D
+
+    D{Budgeting:<br/>Anggaran Tersedia?}
+    D -->|Tidak| E[Notifikasi<br/>Budget Tidak Cukup]
+    E --> END2([End])
+    D -->|Ya| F
+
+    F[Procurement:<br/>Kirim Draft PO ke Supplier] --> G
+    G[Supplier:<br/>Kirim PO Resmi] --> H
+    H[Procurement:<br/>Input Kontrak<br/>+ Termin Pembayaran] --> I
+    I[Supplier:<br/>Kirim Barang + Tagihan] --> J
+    J[Keuangan:<br/>Input Data Tagihan<br/>+ Upload Berkas] --> K
+    K[Kasir:<br/>Cairkan Dana<br/>Pembayaran] --> END3([End])
+
+    style START fill:#f0fdf4,stroke:#22c55e,color:#166534
+    style END1 fill:#fef2f2,stroke:#ef4444,color:#991b1b
+    style END2 fill:#fef2f2,stroke:#ef4444,color:#991b1b
+    style END3 fill:#f0fdf4,stroke:#22c55e,color:#166534
+    style C fill:#fef2f2,stroke:#fca5a5,color:#991b1b
+    style E fill:#fef2f2,stroke:#fca5a5,color:#991b1b
+    style B fill:#eff6ff,stroke:#3b82f6,color:#1e40af
+    style D fill:#eff6ff,stroke:#3b82f6,color:#1e40af`}
+          />
+          <p className="mt-2 text-sm text-zinc-400 text-center">
+            Activity Diagram — Alur Permintaan dengan 2 decision gate
+          </p>
+        </Subsection>
+
+        {/* 1.5 Mockup */}
+        <Subsection title="1.5 Desain Interface / Mockup">
+          <p className="mb-6 leading-relaxed text-zinc-600">
+            Komponen UI Back Office yang diusulkan:
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { title: "Top Navigation", desc: "Dashboard | Permintaan | Kontrak | Tagihan | Pembayaran | Laporan" },
+              { title: "Dashboard", desc: "Card ringkasan: permintaan menunggu, kontrak aktif, tagihan pending" },
+              { title: "Tabel Data", desc: "Sortable, searchable, pagination — untuk semua modul" },
+              { title: "Form Input", desc: "Validasi client + server, multi-item dynamic fields" },
+              { title: "Upload", desc: "Drag & drop, preview PDF/JPG, max 5MB" },
+              { title: "Notifikasi", desc: "Badge counter + toast popup real-time" },
+            ].map(({ title, desc }) => (
+              <div key={title} className="rounded-lg border border-zinc-200 p-5">
+                <h5 className="mb-1 text-sm font-semibold text-zinc-800">{title}</h5>
+                <p className="text-sm leading-relaxed text-zinc-500">{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8">
+            <a
+              href="/prototype"
+              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Buka Interactive Prototype
+            </a>
+            <p className="mt-3 text-sm text-zinc-400">
+              Prototype interaktif mencakup 7 role aktor dan 15 use case — simulasi alur pengadaan dari Unit Pemohon hingga Manager.
+            </p>
+          </div>
+        </Subsection>
+      </Section>
+
+      {/* ════════════════════════════════════════ */}
+      {/* ───── SECTION 2 ───── */}
+      {/* ════════════════════════════════════════ */}
+      <Section number="2" title="Model Proses Pengembangan" points={25}>
+        <Subsection title="Hybrid — Agile Scrum + Waterfall (Wagile)">
+          <p className="mb-6 leading-relaxed text-zinc-600">
+            Model hybrid dipilih karena durasi 3 bulan terlalu ketat untuk full
+            Waterfall namun terlalu berisiko untuk full Agile — sistem keuangan
+            wajib memiliki dokumentasi lengkap.
+          </p>
+          <Table
+            headers={["Faktor", "Alasan Hybrid"]}
+            rows={[
+              ["Durasi 3 bulan", "Terlalu ketat untuk full Waterfall, terlalu berisiko untuk full Agile"],
+              ["Requirement jelas", "Alur bisnis detail — fondasi Waterfall kuat"],
+              ["Multi-stakeholder", "Butuh sprint demo per modul ke masing-masing aktor"],
+              ["Dependency antar modul", "Permintaan → Validasi → Kontrak → Tagihan → Bayar (berurutan)"],
+              ["Dokumentasi wajib", "Sistem keuangan — FSD/TSD harus ada untuk audit"],
+            ]}
+          />
+
+          <h4 className="mb-6 mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            Timeline 12 Minggu
+          </h4>
+          <div className="space-y-3">
+            {[
+              { week: "1–2", phase: "Analisis & Desain", tag: "Waterfall", output: "BRD, FSD, ERD, UML, Mockup" },
+              { week: "3–4", phase: "Sprint 1 — Permintaan & Validasi", tag: "Agile", output: "Demo ke Procurement & Unit Pemohon" },
+              { week: "5–6", phase: "Sprint 2 — Budgeting & Kontrak", tag: "Agile", output: "Demo ke Budgeting & Procurement" },
+              { week: "7–8", phase: "Sprint 3 — Tagihan & Pembayaran", tag: "Agile", output: "Demo ke Keuangan & Kasir" },
+              { week: "9–10", phase: "Sprint 4 — Laporan & Finishing", tag: "Agile", output: "Demo ke Manager" },
+              { week: "11–12", phase: "UAT, Bug Fixing, Go Live", tag: "Final", output: "User Acceptance Test → Deployment 🚀" },
+            ].map(({ week, phase, tag, output }) => (
+              <div key={week} className="flex flex-wrap items-center gap-x-6 gap-y-1 rounded-lg border border-zinc-200 px-5 py-4 text-sm">
+                <span className="w-12 text-xs font-medium text-zinc-400">W{week}</span>
+                <span className="font-medium text-zinc-800">{phase}</span>
+                <span className="ml-auto rounded-full bg-zinc-100 px-3 py-0.5 text-xs font-medium text-zinc-500">{tag}</span>
+                <span className="w-full text-zinc-400">{output}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 space-y-1 text-sm text-zinc-500">
+            {["M1 (W2): FSD & Desain disetujui", "M2 (W4): Modul Permintaan + Validasi live", "M3 (W6): Modul Budgeting + Kontrak live", "M4 (W8): Modul Tagihan + Pembayaran live", "M5 (W10): Semua modul selesai", "M6 (W12): UAT selesai, GO LIVE 🚀"].map((m) => (
+              <p key={m}><span className="font-semibold text-zinc-700">{m.split(":")[0]}</span>: {m.split(": ")[1]}</p>
+            ))}
+          </div>
+          <div className="mt-8">
+            <a
+              href="/prototype"
+              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Buka Interactive Prototype
+            </a>
+            <p className="mt-3 text-sm text-zinc-400">
+              Prototype interaktif mencakup 7 role aktor dan 15 use case — simulasi alur pengadaan dari Unit Pemohon hingga Manager.
+            </p>
+          </div>
+        </Subsection>
+      </Section>
+
+      {/* ════════════════════════════════════════ */}
+      {/* ───── SECTION 3 ───── */}
+      {/* ════════════════════════════════════════ */}
+      <Section number="3" title="SDM yang Dibutuhkan" points={10}>
+        <Table
+          headers={["#", "Role", "Jumlah", "Tanggung Jawab"]}
+          rows={[
+            ["1", "Project Manager", "1", "Koordinasi, timeline, stakeholder communication"],
+            ["2", "System Analyst (saya)", "1", "Requirement gathering, FSD, UML, ERD, mockup, UAT"],
+            ["3", "Backend Developer", "2", "API development, database, business logic"],
+            ["4", "Frontend Developer", "1", "UI/UX back office, implementasi mockup"],
+            ["5", "QA / Tester", "1", "Test case, regression test, bug reporting"],
+            ["6", "Database Administrator", "1", "DB schema, indexing, optimization, backup"],
+          ]}
+          footer="Total: 7 orang"
+        />
+      </Section>
+
+      {/* ════════════════════════════════════════ */}
+      {/* ───── SECTION 4 ───── */}
+      {/* ════════════════════════════════════════ */}
+      <Section number="4" title="Penjadwalan Proyek" points={10}>
+        <p className="mb-8 leading-relaxed text-zinc-600">
+          Timeline 3 bulan (12 minggu) dengan 4 sprint 2-mingguan, 6 milestone,
+          dan buffer 1 minggu untuk unexpected issues.
+        </p>
+
+        <div className="overflow-x-auto">
+          <div className="mb-2 flex text-xs text-zinc-400">
+            <span className="w-36 shrink-0" />
+            {Array.from({ length: 12 }, (_, i) => (
+              <span key={i} className="w-10 text-center">{i + 1}</span>
+            ))}
+          </div>
+          <div className="space-y-1">
+            {[
+              { label: "Analisis & Desain", weeks: [1, 2], color: "bg-amber-100 border-amber-300 text-amber-800" },
+              { label: "Sprint 1 — Permintaan", weeks: [3, 4], color: "bg-blue-100 border-blue-300 text-blue-800" },
+              { label: "Sprint 2 — Budgeting", weeks: [5, 6], color: "bg-emerald-100 border-emerald-300 text-emerald-800" },
+              { label: "Sprint 3 — Tagihan", weeks: [7, 8], color: "bg-purple-100 border-purple-300 text-purple-800" },
+              { label: "Sprint 4 — Laporan", weeks: [9, 10], color: "bg-rose-100 border-rose-300 text-rose-800" },
+              { label: "UAT & Go Live", weeks: [11, 12], color: "bg-zinc-200 border-zinc-400 text-zinc-700" },
+            ].map(({ label, weeks, color }) => (
+              <div key={label} className="flex items-center text-xs">
+                <span className="w-36 shrink-0 pr-3 text-right text-zinc-500">{label}</span>
+                {Array.from({ length: 12 }, (_, i) => {
+                  const active = i + 1 >= weeks[0] && i + 1 <= weeks[1];
+                  return (
+                    <span key={i} className={`w-10 h-7 border-r border-white ${active ? color : "bg-zinc-50"}`} />
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <p className="mt-3 text-xs text-zinc-400">Minggu 1 – 12</p>
+      </Section>
+
+      {/* ════════════════════════════════════════ */}
+      {/* ───── SECTION 5 ───── */}
+      {/* ════════════════════════════════════════ */}
+      <Section number="5" title="Key Point Laporan ke Project Manager" points={5}>
+        <div className="mb-10">
+          <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-400">Sisi Teknis</h4>
+          <div className="space-y-4">
+            {[
+              { id: 1, title: "Database harus support MULTI-ITEM per transaksi", risk: "User input berulang & data tidak akurat" },
+              { id: 2, title: "Upload dokumen harus ada validasi (max 5MB, PDF/JPG)", risk: "Storage penuh dan file korup" },
+              { id: 3, title: "Role-based access control — Unit Pemohon ≠ modul Keuangan", risk: "Kebocoran data sensitif — risiko audit" },
+              { id: 4, title: "Notifikasi real-time via sistem (bukan email)", risk: "Bottleneck di validasi manual — project delay" },
+              { id: 5, title: "Backup database harian", risk: "Data keuangan hilang — audit failure" },
+            ].map(({ id, title, risk }) => (
+              <div key={id} className="flex gap-4">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-500">{id}</span>
+                <div>
+                  <p className="font-medium text-zinc-800">{title}</p>
+                  <p className="text-sm text-red-500">⚠ Risiko: {risk}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
+
+        <div>
+          <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-400">Sisi Manajerial</h4>
+          <div className="space-y-4">
+            {[
+              { id: 1, title: "Sign-off FSD dari semua stakeholder sebelum mulai coding", risk: "Scope creep, revisi tak berujung" },
+              { id: 2, title: "Demo sprint setiap 2 minggu ke user — bukan tunggu UAT akhir", risk: "Mismatch ekspektasi → rework besar" },
+              { id: 3, title: "Training user minimal 1 minggu sebelum go-live", risk: "Resistance & kesalahan input" },
+              { id: 4, title: "Dedicated QA sejak Sprint 1 — bukan cuma tes di akhir", risk: "Bug menumpuk → go-live tertunda" },
+              { id: 5, title: "Buffer 1 minggu untuk unexpected issues", risk: "Tanpa buffer, deadline PASTI meleset" },
+            ].map(({ id, title, risk }) => (
+              <div key={id} className="flex gap-4">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-500">{id}</span>
+                <div>
+                  <p className="font-medium text-zinc-800">{title}</p>
+                  <p className="text-sm text-red-500">⚠ Risiko: {risk}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ───── FOOTER ───── */}
+      <footer className="mt-32 border-t border-zinc-200 pt-12 text-center">
+        <p className="text-sm italic text-zinc-400">Disusun oleh</p>
+        <p className="mt-1 text-lg font-semibold text-zinc-800">Ridha Fahmi Junaidi</p>
+        <p className="text-sm text-zinc-400">System Analyst Candidate</p>
+        <p className="mt-6 text-xs text-zinc-300">PT Aksa Digital Group — 25 Juni 2026</p>
+      </footer>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   REUSABLE COMPONENTS
+   ════════════════════════════════════════════════════════ */
+
+function Section({ number, title, points, children }: { number: string; title: string; points: number; children: React.ReactNode }) {
+  return (
+    <section className="mb-24">
+      <div className="mb-10">
+        <span className="mb-2 block text-xs font-medium uppercase tracking-[0.25em] text-zinc-300">Section {number}</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{title}</h2>
+        <span className="mt-2 inline-block rounded-full bg-zinc-100 px-3 py-0.5 text-xs font-medium text-zinc-500">{points} poin</span>
+      </div>
+      <div className="space-y-12">{children}</div>
+    </section>
+  );
+}
+
+function Subsection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h3 className="mb-4 text-base font-semibold text-zinc-800">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function Table({ headers, rows, footer }: { headers: string[]; rows: string[][]; footer?: string }) {
+  return (
+    <div className="overflow-x-auto rounded-lg border border-zinc-200">
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-zinc-200 bg-zinc-50">
+            {headers.map((h) => (
+              <th key={h} className="px-4 py-3 font-semibold text-zinc-500 first:pl-5 last:pr-5">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i} className="border-b border-zinc-100 last:border-none">
+              {row.map((cell, j) => (
+                <td key={j} className="px-4 py-3 text-zinc-600 first:pl-5 last:pr-5">{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {footer && (
+        <div className="border-t border-zinc-200 bg-zinc-50 px-5 py-2 text-sm font-medium text-zinc-600">{footer}</div>
+      )}
     </div>
   );
 }
