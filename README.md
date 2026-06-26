@@ -59,18 +59,6 @@
 
 ---
 
-## 🔄 Feedback & Iterasi
-
-Berdasarkan feedback reviewer, dilakukan perbaikan:
-
-| Feedback | Perbaikan |
-|----------|-----------|
-| Supplier sebaiknya **Secondary Actor** (interaksi offline) | ✅ Use Case diagram diperbarui — Supplier jadi secondary actor dengan dashed line |
-| PEMBAYARAN perlu FK ke `id_termin` | ✅ ERD diperbarui — relasi TERMIN_PEMBAYARAN → PEMBAYARAN ditambahkan |
-| Perlu format dokumen untuk download | ✅ Tambah endpoint `/api/download` → file .docx |
-
----
-
 ## 🖥️ Interactive Prototype
 
 Prototype interaktif tersedia di **[/prototype](https://sa-visual.ahdirmai.id/prototype)**:
