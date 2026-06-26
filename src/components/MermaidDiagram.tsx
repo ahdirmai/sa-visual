@@ -24,6 +24,7 @@ mermaid.initialize({
 export default function MermaidDiagram({ chart }: { chart: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -34,13 +35,29 @@ export default function MermaidDiagram({ chart }: { chart: string }) {
       .then(({ svg }) => {
         if (containerRef.current) {
           containerRef.current.innerHTML = svg;
+          // Make SVG responsive: remove fixed width/height, keep viewBox
+          const svgEl = containerRef.current.querySelector("svg");
+          if (svgEl) {
+            const vb = svgEl.getAttribute("viewBox");
+            if (!vb) {
+              const w = svgEl.getAttribute("width") || "800";
+              const h = svgEl.getAttribute("height") || "600";
+              svgEl.setAttribute("viewBox", `0 0 ${parseFloat(w)} ${parseFloat(h)}`);
+            }
+            svgEl.removeAttribute("width");
+            svgEl.removeAttribute("height");
+            svgEl.style.width = "100%";
+            svgEl.style.height = "auto";
+            svgEl.style.maxWidth = expanded ? "none" : "100%";
+            svgEl.style.minWidth = expanded ? "900px" : "0";
+          }
           setError(null);
         }
       })
       .catch((err) => {
         setError(err.message);
       });
-  }, [chart]);
+  }, [chart, expanded]);
 
   if (error) {
     return (
@@ -51,9 +68,17 @@ export default function MermaidDiagram({ chart }: { chart: string }) {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="mermaid-container flex justify-center overflow-x-auto rounded-lg border border-zinc-200 bg-white p-6"
-    />
+    <div className="space-y-2">
+      <div
+        ref={containerRef}
+        className={`mermaid-container rounded-lg border border-zinc-200 bg-white p-4 sm:p-6 ${expanded ? "overflow-x-auto" : "overflow-hidden"}`}
+      />
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-xs font-medium text-zinc-400 hover:text-zinc-600 transition-colors"
+      >
+        {expanded ? "📐 Fit to screen" : "🔍 Expand / Zoom"}
+      </button>
+    </div>
   );
 }
