@@ -10,13 +10,12 @@
       <lane id="L1" name="Unit Pemohon">
         <flowNodeRef>Start</flowNodeRef>
         <flowNodeRef>T_Input</flowNodeRef>
-        <flowNodeRef>T_Notif1</flowNodeRef>
-        <flowNodeRef>T_Notif2</flowNodeRef>
-        <flowNodeRef>End_Bad</flowNodeRef>
       </lane>
       <lane id="L2" name="Procurement">
         <flowNodeRef>T_Validasi</flowNodeRef>
         <flowNodeRef>GW1</flowNodeRef>
+        <flowNodeRef>T_Notif</flowNodeRef>
+        <flowNodeRef>End_Bad</flowNodeRef>
         <flowNodeRef>T_KirimPO</flowNodeRef>
         <flowNodeRef>T_Terima</flowNodeRef>
         <flowNodeRef>T_Kontrak</flowNodeRef>
@@ -26,34 +25,33 @@
         <flowNodeRef>T_Cek</flowNodeRef>
         <flowNodeRef>GW2</flowNodeRef>
       </lane>
-      <lane id="L4" name="Supplier (Eksternal)">
-        <flowNodeRef>T_TerimaPO</flowNodeRef>
-        <flowNodeRef>T_Kirim</flowNodeRef>
-      </lane>
-      <lane id="L5" name="Keuangan">
+      <lane id="L4" name="Keuangan">
         <flowNodeRef>T_Tagihan</flowNodeRef>
         <flowNodeRef>T_NotifKasir</flowNodeRef>
       </lane>
-      <lane id="L6" name="Kasir">
+      <lane id="L5" name="Kasir">
         <flowNodeRef>T_Bayar</flowNodeRef>
         <flowNodeRef>End_Ok</flowNodeRef>
+      </lane>
+      <lane id="L6" name="Supplier (Eksternal)">
+        <flowNodeRef>T_TerimaPO</flowNodeRef>
+        <flowNodeRef>T_Kirim</flowNodeRef>
       </lane>
     </laneSet>
 
     <startEvent id="Start" name="Mulai"><outgoing>S1</outgoing></startEvent>
-    <endEvent id="End_Bad" name="Selesai"><incoming>S15</incoming><incoming>S16</incoming></endEvent>
+    <endEvent id="End_Bad" name="Selesai"><incoming>S15</incoming></endEvent>
     <endEvent id="End_Ok" name="Selesai"><incoming>S14</incoming></endEvent>
 
     <task id="T_Input" name="Input Permintaan&#10;Barang"><incoming>S1</incoming><outgoing>S2</outgoing></task>
     <task id="T_Validasi" name="Validasi&#10;Kebutuhan"><incoming>S2</incoming><outgoing>S3</outgoing></task>
     <exclusiveGateway id="GW1" name="Disetujui?"><incoming>S3</incoming><outgoing>S4</outgoing><outgoing>S5</outgoing></exclusiveGateway>
-    <task id="T_Notif1" name="Notifikasi&#10;Penolakan"><incoming>S5</incoming><outgoing>S15</outgoing></task>
+    <task id="T_Notif" name="Notifikasi&#10;Ditolak"><incoming>S5</incoming><incoming>S8</incoming><outgoing>S15</outgoing></task>
     <task id="T_Cek" name="Verifikasi&#10;Anggaran"><incoming>S4</incoming><outgoing>S6</outgoing></task>
-    <exclusiveGateway id="GW2" name="Tersedia?"><incoming>S6</incoming><outgoing>S7</outgoing><outgoing>S8</outgoing></exclusiveGateway>
-    <task id="T_Notif2" name="Notifikasi Anggaran&#10;Tidak Tersedia"><incoming>S8</incoming><outgoing>S16</outgoing></task>
+    <exclusiveGateway id="GW2" name="Anggaran&#10;Tersedia?"><incoming>S6</incoming><outgoing>S7</outgoing><outgoing>S8</outgoing></exclusiveGateway>
     <task id="T_KirimPO" name="Kirim Draft PO&#10;ke Supplier"><incoming>S7</incoming><outgoing>S9</outgoing></task>
     <task id="T_TerimaPO" name="Terima PO &amp;&#10;Proses Pesanan"><incoming>S9</incoming><outgoing>S10</outgoing></task>
-    <task id="T_Kirim" name="Kirim Barang&#10;+ Tagihan"><incoming>S10</incoming><outgoing>S11</outgoing></task>
+    <task id="T_Kirim" name="Kirim Barang +&#10;Tagihan Resmi"><incoming>S10</incoming><outgoing>S11</outgoing></task>
     <task id="T_Terima" name="Terima Barang&#10;&amp; Verifikasi"><incoming>S11</incoming><outgoing>S12</outgoing></task>
     <task id="T_Kontrak" name="Input Kontrak&#10;&amp; Termin"><incoming>S12</incoming><outgoing>S13</outgoing></task>
     <task id="T_Forward" name="Teruskan Tagihan&#10;ke Keuangan"><incoming>S13</incoming><outgoing>S17</outgoing></task>
@@ -65,18 +63,17 @@
     <sequenceFlow id="S2" sourceRef="T_Input" targetRef="T_Validasi" />
     <sequenceFlow id="S3" sourceRef="T_Validasi" targetRef="GW1" />
     <sequenceFlow id="S4" name="Ya" sourceRef="GW1" targetRef="T_Cek" />
-    <sequenceFlow id="S5" name="Tidak" sourceRef="GW1" targetRef="T_Notif1" />
+    <sequenceFlow id="S5" name="Tidak" sourceRef="GW1" targetRef="T_Notif" />
     <sequenceFlow id="S6" sourceRef="T_Cek" targetRef="GW2" />
     <sequenceFlow id="S7" name="Ya" sourceRef="GW2" targetRef="T_KirimPO" />
-    <sequenceFlow id="S8" name="Tidak" sourceRef="GW2" targetRef="T_Notif2" />
+    <sequenceFlow id="S8" name="Tidak" sourceRef="GW2" targetRef="T_Notif" />
     <sequenceFlow id="S9" sourceRef="T_KirimPO" targetRef="T_TerimaPO" />
     <sequenceFlow id="S10" sourceRef="T_TerimaPO" targetRef="T_Kirim" />
     <sequenceFlow id="S11" sourceRef="T_Kirim" targetRef="T_Terima" />
     <sequenceFlow id="S12" sourceRef="T_Terima" targetRef="T_Kontrak" />
     <sequenceFlow id="S13" sourceRef="T_Kontrak" targetRef="T_Forward" />
     <sequenceFlow id="S14" sourceRef="T_Bayar" targetRef="End_Ok" />
-    <sequenceFlow id="S15" sourceRef="T_Notif1" targetRef="End_Bad" />
-    <sequenceFlow id="S16" sourceRef="T_Notif2" targetRef="End_Bad" />
+    <sequenceFlow id="S15" sourceRef="T_Notif" targetRef="End_Bad" />
     <sequenceFlow id="S17" sourceRef="T_Forward" targetRef="T_Tagihan" />
     <sequenceFlow id="S18" sourceRef="T_Tagihan" targetRef="T_NotifKasir" />
     <sequenceFlow id="S19" sourceRef="T_NotifKasir" targetRef="T_Bayar" />
@@ -85,207 +82,193 @@
   <bpmndi:BPMNDiagram id="BD1">
     <bpmndi:BPMNPlane id="BP1" bpmnElement="ProcurementProcess">
 
-      <!-- ═══════════ LANES ═══════════ -->
-      <!-- Width=1800, 6 lanes stacked vertically -->
+      <!-- ═══════════ LANES (urutan baru) ═══════════ -->
+      <!-- L1 Unit Pemohon | L2 Procurement | L3 Budgeting | L4 Keuangan | L5 Kasir | L6 Supplier -->
       <bpmndi:BPMNShape id="L1_d" bpmnElement="L1" isHorizontal="true">
-        <dc:Bounds x="100" y="0" width="1800" height="120" />
+        <dc:Bounds x="100" y="0" width="1800" height="110" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="L2_d" bpmnElement="L2" isHorizontal="true">
-        <dc:Bounds x="100" y="120" width="1800" height="150" />
+        <dc:Bounds x="100" y="110" width="1800" height="190" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="L3_d" bpmnElement="L3" isHorizontal="true">
-        <dc:Bounds x="100" y="270" width="1800" height="120" />
+        <dc:Bounds x="100" y="300" width="1800" height="120" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="L4_d" bpmnElement="L4" isHorizontal="true">
-        <dc:Bounds x="100" y="390" width="1800" height="120" />
+        <dc:Bounds x="100" y="420" width="1800" height="120" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="L5_d" bpmnElement="L5" isHorizontal="true">
-        <dc:Bounds x="100" y="510" width="1800" height="120" />
+        <dc:Bounds x="100" y="540" width="1800" height="120" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="L6_d" bpmnElement="L6" isHorizontal="true">
-        <dc:Bounds x="100" y="630" width="1800" height="110" />
+        <dc:Bounds x="100" y="660" width="1800" height="120" />
       </bpmndi:BPMNShape>
 
-      <!-- ═══════════ UNIT PEMOHON (y=0..120, center y=60) ═══════════ -->
+      <!-- ═══════════ UNIT PEMOHON (y=0..110, center y=55) ═══════════ -->
       <bpmndi:BPMNShape id="Start_d" bpmnElement="Start">
-        <dc:Bounds x="160" y="42" width="36" height="36" />
+        <dc:Bounds x="160" y="37" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_Input_d" bpmnElement="T_Input">
-        <dc:Bounds x="260" y="30" width="130" height="60" />
-      </bpmndi:BPMNShape>
-      <!-- Notif1 &amp; Notif2 spaced apart to avoid overlap -->
-      <bpmndi:BPMNShape id="T_Notif1_d" bpmnElement="T_Notif1">
-        <dc:Bounds x="700" y="30" width="140" height="60" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="T_Notif2_d" bpmnElement="T_Notif2">
-        <dc:Bounds x="1050" y="30" width="170" height="60" />
-      </bpmndi:BPMNShape>
-      <!-- End_Bad moved far right with space for both S15 and S16 -->
-      <bpmndi:BPMNShape id="End_Bad_d" bpmnElement="End_Bad">
-        <dc:Bounds x="1380" y="42" width="36" height="36" />
+        <dc:Bounds x="250" y="25" width="130" height="60" />
       </bpmndi:BPMNShape>
 
-      <!-- ═══════════ PROCUREMENT (y=120..270, center y=195) ═══════════ -->
+      <!-- ═══════════ PROCUREMENT (y=110..300) — 2 baris ═══════════ -->
+      <!-- Baris atas (y center 165): Validasi, GW1, Notif, End_Bad -->
       <bpmndi:BPMNShape id="T_Validasi_d" bpmnElement="T_Validasi">
-        <dc:Bounds x="470" y="155" width="130" height="60" />
+        <dc:Bounds x="250" y="135" width="130" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="GW1_d" bpmnElement="GW1" isMarkerVisible="true">
-        <dc:Bounds x="660" y="175" width="40" height="40" />
+        <dc:Bounds x="440" y="145" width="40" height="40" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Notif_d" bpmnElement="T_Notif">
+        <dc:Bounds x="560" y="135" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Bad_d" bpmnElement="End_Bad">
+        <dc:Bounds x="760" y="147" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <!-- Baris bawah (y center 250): KirimPO, Terima, Kontrak, Forward -->
       <bpmndi:BPMNShape id="T_KirimPO_d" bpmnElement="T_KirimPO">
-        <dc:Bounds x="920" y="155" width="160" height="60" />
+        <dc:Bounds x="900" y="220" width="150" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_Terima_d" bpmnElement="T_Terima">
-        <dc:Bounds x="1200" y="155" width="140" height="60" />
+        <dc:Bounds x="1300" y="220" width="140" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_Kontrak_d" bpmnElement="T_Kontrak">
-        <dc:Bounds x="1410" y="155" width="140" height="60" />
+        <dc:Bounds x="1500" y="220" width="140" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_Forward_d" bpmnElement="T_Forward">
-        <dc:Bounds x="1620" y="155" width="140" height="60" />
+        <dc:Bounds x="1700" y="220" width="140" height="60" />
       </bpmndi:BPMNShape>
 
-      <!-- ═══════════ BUDGETING (y=270..390, center y=330) ═══════════ -->
+      <!-- ═══════════ BUDGETING (y=300..420, center y=360) ═══════════ -->
       <bpmndi:BPMNShape id="T_Cek_d" bpmnElement="T_Cek">
-        <dc:Bounds x="790" y="300" width="140" height="60" />
+        <dc:Bounds x="500" y="330" width="130" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="GW2_d" bpmnElement="GW2" isMarkerVisible="true">
-        <dc:Bounds x="990" y="310" width="40" height="40" />
+        <dc:Bounds x="690" y="340" width="40" height="40" />
       </bpmndi:BPMNShape>
 
-      <!-- ═══════════ SUPPLIER (y=390..510, center y=450) ═══════════ -->
-      <bpmndi:BPMNShape id="T_TerimaPO_d" bpmnElement="T_TerimaPO">
-        <dc:Bounds x="920" y="420" width="160" height="60" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="T_Kirim_d" bpmnElement="T_Kirim">
-        <dc:Bounds x="1150" y="420" width="140" height="60" />
-      </bpmndi:BPMNShape>
-
-      <!-- ═══════════ KEUANGAN (y=510..630, center y=570) ═══════════ -->
+      <!-- ═══════════ KEUANGAN (y=420..540, center y=480) ═══════════ -->
       <bpmndi:BPMNShape id="T_Tagihan_d" bpmnElement="T_Tagihan">
-        <dc:Bounds x="1250" y="540" width="170" height="60" />
+        <dc:Bounds x="1700" y="450" width="150" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_NotifKasir_d" bpmnElement="T_NotifKasir">
-        <dc:Bounds x="1490" y="540" width="140" height="60" />
+        <dc:Bounds x="1500" y="450" width="140" height="60" />
       </bpmndi:BPMNShape>
 
-      <!-- ═══════════ KASIR (y=630..740, center y=685) ═══════════ -->
+      <!-- ═══════════ KASIR (y=540..660, center y=600) ═══════════ -->
       <bpmndi:BPMNShape id="T_Bayar_d" bpmnElement="T_Bayar">
-        <dc:Bounds x="1430" y="660" width="140" height="60" />
+        <dc:Bounds x="1500" y="570" width="140" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="End_Ok_d" bpmnElement="End_Ok">
-        <dc:Bounds x="1640" y="672" width="36" height="36" />
+        <dc:Bounds x="1720" y="582" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- ═══════════ SUPPLIER (y=660..780, center y=720) ═══════════ -->
+      <bpmndi:BPMNShape id="T_TerimaPO_d" bpmnElement="T_TerimaPO">
+        <dc:Bounds x="900" y="690" width="150" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Kirim_d" bpmnElement="T_Kirim">
+        <dc:Bounds x="1100" y="690" width="150" height="60" />
       </bpmndi:BPMNShape>
 
       <!-- ═══════════ SEQUENCE FLOW EDGES ═══════════ -->
 
-      <!-- S1: Start → Input (horizontal right) -->
+      <!-- S1: Start → Input (horizontal) -->
       <bpmndi:BPMNEdge id="S1_d" bpmnElement="S1">
-        <di:waypoint x="196" y="60" /><di:waypoint x="260" y="60" />
+        <di:waypoint x="196" y="55" /><di:waypoint x="250" y="55" />
       </bpmndi:BPMNEdge>
 
-      <!-- S2: Input → Validasi (down-right diagonal) -->
+      <!-- S2: Input → Validasi (down) -->
       <bpmndi:BPMNEdge id="S2_d" bpmnElement="S2">
-        <di:waypoint x="390" y="60" /><di:waypoint x="430" y="60" />
-        <di:waypoint x="430" y="185" /><di:waypoint x="470" y="185" />
+        <di:waypoint x="315" y="85" /><di:waypoint x="315" y="135" />
       </bpmndi:BPMNEdge>
 
-      <!-- S3: Validasi → GW1 (horizontal right) -->
+      <!-- S3: Validasi → GW1 (horizontal) -->
       <bpmndi:BPMNEdge id="S3_d" bpmnElement="S3">
-        <di:waypoint x="600" y="185" /><di:waypoint x="660" y="195" />
+        <di:waypoint x="380" y="165" /><di:waypoint x="440" y="165" />
       </bpmndi:BPMNEdge>
 
-      <!-- S5: GW1 → Notif1 (Tidak — up-left) -->
+      <!-- S5: GW1 → Notif (Tidak, horizontal right) -->
       <bpmndi:BPMNEdge id="S5_d" bpmnElement="S5">
-        <di:waypoint x="680" y="175" /><di:waypoint x="680" y="140" />
-        <di:waypoint x="770" y="140" /><di:waypoint x="770" y="90" />
+        <di:waypoint x="480" y="165" /><di:waypoint x="560" y="165" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNLabel id="S5_lbl"><dc:Bounds x="695" y="126" width="35" height="14" /></bpmndi:BPMNLabel>
+      <bpmndi:BPMNLabel id="S5_lbl"><dc:Bounds x="500" y="147" width="35" height="14" /></bpmndi:BPMNLabel>
 
-      <!-- S4: GW1 → Cek Anggaran (Ya — down) -->
+      <!-- S15: Notif → End_Bad (horizontal right) -->
+      <bpmndi:BPMNEdge id="S15_d" bpmnElement="S15">
+        <di:waypoint x="690" y="165" /><di:waypoint x="760" y="165" />
+      </bpmndi:BPMNEdge>
+
+      <!-- S4: GW1 → Cek (Ya, down to Budgeting) -->
       <bpmndi:BPMNEdge id="S4_d" bpmnElement="S4">
-        <di:waypoint x="680" y="215" /><di:waypoint x="680" y="260" />
-        <di:waypoint x="860" y="260" /><di:waypoint x="860" y="300" />
+        <di:waypoint x="460" y="185" /><di:waypoint x="460" y="290" />
+        <di:waypoint x="565" y="290" /><di:waypoint x="565" y="330" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNLabel id="S4_lbl"><dc:Bounds x="695" y="248" width="20" height="14" /></bpmndi:BPMNLabel>
+      <bpmndi:BPMNLabel id="S4_lbl"><dc:Bounds x="465" y="200" width="20" height="14" /></bpmndi:BPMNLabel>
 
-      <!-- S6: Cek → GW2 (horizontal right) -->
+      <!-- S6: Cek → GW2 (horizontal) -->
       <bpmndi:BPMNEdge id="S6_d" bpmnElement="S6">
-        <di:waypoint x="930" y="330" /><di:waypoint x="990" y="330" />
+        <di:waypoint x="630" y="360" /><di:waypoint x="690" y="360" />
       </bpmndi:BPMNEdge>
 
-      <!-- S8: GW2 → Notif2 (Tidak — up, routed LEFT of GW2 center to avoid S7 crossing) -->
+      <!-- S8: GW2 → Notif (Tidak, loops up to Procurement Notif) -->
       <bpmndi:BPMNEdge id="S8_d" bpmnElement="S8">
-        <di:waypoint x="990" y="310" /><di:waypoint x="960" y="310" />
-        <di:waypoint x="960" y="250" /><di:waypoint x="1135" y="250" />
-        <di:waypoint x="1135" y="90" />
+        <di:waypoint x="710" y="340" /><di:waypoint x="710" y="210" />
+        <di:waypoint x="625" y="210" /><di:waypoint x="625" y="195" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNLabel id="S8_lbl"><dc:Bounds x="975" y="236" width="35" height="14" /></bpmndi:BPMNLabel>
+      <bpmndi:BPMNLabel id="S8_lbl"><dc:Bounds x="715" y="280" width="35" height="14" /></bpmndi:BPMNLabel>
 
-      <!-- S7: GW2 → KirimPO (Ya — routed RIGHT of GW2 center, goes right then up) -->
+      <!-- S7: GW2 → KirimPO (Ya, right then up to Procurement row 2) -->
       <bpmndi:BPMNEdge id="S7_d" bpmnElement="S7">
-        <di:waypoint x="1030" y="330" /><di:waypoint x="1060" y="330" />
-        <di:waypoint x="1060" y="280" /><di:waypoint x="1000" y="280" />
-        <di:waypoint x="1000" y="215" />
+        <di:waypoint x="730" y="360" /><di:waypoint x="975" y="360" />
+        <di:waypoint x="975" y="280" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNLabel id="S7_lbl"><dc:Bounds x="1035" y="316" width="20" height="14" /></bpmndi:BPMNLabel>
+      <bpmndi:BPMNLabel id="S7_lbl"><dc:Bounds x="800" y="342" width="20" height="14" /></bpmndi:BPMNLabel>
 
-      <!-- S9: KirimPO → TerimaPO (down to Supplier lane) -->
+      <!-- S9: KirimPO → TerimaPO (down to Supplier, far) -->
       <bpmndi:BPMNEdge id="S9_d" bpmnElement="S9">
-        <di:waypoint x="1000" y="215" /><di:waypoint x="1000" y="420" />
+        <di:waypoint x="975" y="280" /><di:waypoint x="975" y="690" />
       </bpmndi:BPMNEdge>
 
-      <!-- S10: TerimaPO → Kirim Barang (horizontal right) -->
+      <!-- S10: TerimaPO → Kirim Barang (horizontal in Supplier) -->
       <bpmndi:BPMNEdge id="S10_d" bpmnElement="S10">
-        <di:waypoint x="1080" y="450" /><di:waypoint x="1150" y="450" />
+        <di:waypoint x="1050" y="720" /><di:waypoint x="1100" y="720" />
       </bpmndi:BPMNEdge>
 
-      <!-- S11: Kirim Barang → Terima Barang (up to Procurement lane) -->
+      <!-- S11: Kirim Barang → Terima Barang (up to Procurement row 2) -->
       <bpmndi:BPMNEdge id="S11_d" bpmnElement="S11">
-        <di:waypoint x="1220" y="420" /><di:waypoint x="1270" y="420" />
-        <di:waypoint x="1270" y="215" />
+        <di:waypoint x="1250" y="720" /><di:waypoint x="1370" y="720" />
+        <di:waypoint x="1370" y="280" />
       </bpmndi:BPMNEdge>
 
-      <!-- S12: Terima Barang → Kontrak (horizontal right) -->
+      <!-- S12: Terima Barang → Kontrak (horizontal) -->
       <bpmndi:BPMNEdge id="S12_d" bpmnElement="S12">
-        <di:waypoint x="1340" y="185" /><di:waypoint x="1410" y="185" />
+        <di:waypoint x="1440" y="250" /><di:waypoint x="1500" y="250" />
       </bpmndi:BPMNEdge>
 
-      <!-- S13: Kontrak → Forward (horizontal right) -->
+      <!-- S13: Kontrak → Forward (horizontal) -->
       <bpmndi:BPMNEdge id="S13_d" bpmnElement="S13">
-        <di:waypoint x="1550" y="185" /><di:waypoint x="1620" y="185" />
+        <di:waypoint x="1640" y="250" /><di:waypoint x="1700" y="250" />
       </bpmndi:BPMNEdge>
 
-      <!-- S17: Forward → Tagihan (down to Keuangan, routed right side) -->
+      <!-- S17: Forward → Tagihan (down to Keuangan) -->
       <bpmndi:BPMNEdge id="S17_d" bpmnElement="S17">
-        <di:waypoint x="1690" y="215" /><di:waypoint x="1690" y="510" />
-        <di:waypoint x="1335" y="510" /><di:waypoint x="1335" y="540" />
+        <di:waypoint x="1770" y="280" /><di:waypoint x="1770" y="450" />
       </bpmndi:BPMNEdge>
 
-      <!-- S18: Tagihan → Notif Kasir (horizontal right) -->
+      <!-- S18: Tagihan → Notif Kasir (horizontal left in Keuangan) -->
       <bpmndi:BPMNEdge id="S18_d" bpmnElement="S18">
-        <di:waypoint x="1420" y="570" /><di:waypoint x="1490" y="570" />
+        <di:waypoint x="1700" y="480" /><di:waypoint x="1640" y="480" />
       </bpmndi:BPMNEdge>
 
       <!-- S19: Notif Kasir → Bayar (down to Kasir) -->
       <bpmndi:BPMNEdge id="S19_d" bpmnElement="S19">
-        <di:waypoint x="1560" y="600" /><di:waypoint x="1560" y="640" />
-        <di:waypoint x="1500" y="640" /><di:waypoint x="1500" y="660" />
+        <di:waypoint x="1570" y="510" /><di:waypoint x="1570" y="570" />
       </bpmndi:BPMNEdge>
 
-      <!-- S14: Bayar → End Ok (horizontal right) -->
+      <!-- S14: Bayar → End Ok (horizontal) -->
       <bpmndi:BPMNEdge id="S14_d" bpmnElement="S14">
-        <di:waypoint x="1570" y="690" /><di:waypoint x="1640" y="690" />
-      </bpmndi:BPMNEdge>
-
-      <!-- S15: Notif1 → End Bad (horizontal right at y=60) -->
-      <bpmndi:BPMNEdge id="S15_d" bpmnElement="S15">
-        <di:waypoint x="840" y="60" /><di:waypoint x="1380" y="60" />
-      </bpmndi:BPMNEdge>
-
-      <!-- S16: Notif2 → End Bad (horizontal right at y=60, below S15 to avoid overlap) -->
-      <bpmndi:BPMNEdge id="S16_d" bpmnElement="S16">
-        <di:waypoint x="1220" y="60" /><di:waypoint x="1380" y="60" />
+        <di:waypoint x="1640" y="600" /><di:waypoint x="1720" y="600" />
       </bpmndi:BPMNEdge>
 
     </bpmndi:BPMNPlane>

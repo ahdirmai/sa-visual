@@ -15,7 +15,7 @@ const html = `<!DOCTYPE html>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: white; font-family: Calibri, Arial, sans-serif; }
-  #canvas { width: 1900px; height: 850px; }
+  #canvas { width: 1900px; height: 820px; }
   .bjs-powered-by { display: none !important; }
   .djs-palette { display: none !important; }
   

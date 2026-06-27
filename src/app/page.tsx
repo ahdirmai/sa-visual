@@ -153,7 +153,7 @@ export default function Home() {
             />
           </div>
           <p className="mt-2 text-sm text-zinc-400 text-center">
-            BPMN Diagram — 6 lane, 2 decision gateway, 14 langkah alur pengadaan
+            BPMN Diagram — 6 lane, 2 decision gateway, alur pengadaan barang
           </p>
 
           <h4 className="mb-4 mt-10 text-sm font-semibold uppercase tracking-wider text-zinc-400">
