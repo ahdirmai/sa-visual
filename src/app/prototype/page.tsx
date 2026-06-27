@@ -96,6 +96,7 @@ export default function PrototypePage() {
   const [selected, setSelected] = useState<Permintaan | null>(null);
   const [alasan, setAlasan] = useState("");
   const [showNotifSuccess, setShowNotifSuccess] = useState("");
+  const [mobileNav, setMobileNav] = useState(false);
 
   const addNotif = (msg: string, v?: View) => {
     setNotifs(n => [{ id: Date.now(), msg, time: "Baru saja", read: false, view: v }, ...n]);
@@ -105,7 +106,7 @@ export default function PrototypePage() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-zinc-50">
-      {/* ─── SIDEBAR ─── */}
+      {/* ─── SIDEBAR (desktop) ─── */}
       <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
         <div className="flex h-14 items-center gap-2 border-b border-zinc-100 px-5">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 text-xs font-bold text-white">SP</div>
@@ -132,12 +133,53 @@ export default function PrototypePage() {
         </div>
       </aside>
 
+      {/* ─── MOBILE NAV DRAWER ─── */}
+      {mobileNav && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          {/* backdrop */}
+          <div className="absolute inset-0 bg-zinc-900/40 backdrop-blur-sm" onClick={() => setMobileNav(false)} />
+          {/* drawer */}
+          <aside className="absolute left-0 top-0 flex h-full w-64 max-w-[80vw] flex-col border-r border-zinc-200 bg-white shadow-xl">
+            <div className="flex h-14 items-center justify-between border-b border-zinc-100 px-5">
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900 text-xs font-bold text-white">SP</div>
+                <span className="text-sm font-semibold tracking-tight">Sistem Pengadaan</span>
+              </div>
+              <button onClick={() => setMobileNav(false)} className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600" aria-label="Tutup menu">✕</button>
+            </div>
+            <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4">
+              {visNav.map(it => (
+                <button key={it.label} onClick={() => { setView(it.label); setMobileNav(false); }}
+                  className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors ${view === it.label ? "bg-zinc-100 font-medium text-zinc-900" : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700"}`}>
+                  <span className="text-xs opacity-60">{it.icon}</span>{it.label}
+                </button>
+              ))}
+            </nav>
+            <div className="border-t border-zinc-100 p-4">
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-zinc-400">Role</p>
+              <select value={role} onChange={e => { setRole(e.target.value as Role); setView("Dashboard"); setShowNotif(false); setMobileNav(false); }}
+                className="w-full rounded-md border border-zinc-200 bg-white px-2.5 py-2 text-sm text-zinc-700 focus:border-zinc-300 focus:outline-none">
+                {ROLES.map(r => <option key={r}>{r}</option>)}
+              </select>
+              <div className="mt-3 flex items-center gap-2.5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-200 text-xs font-medium text-zinc-500">RF</div>
+                <div className="text-xs leading-tight"><p className="font-medium text-zinc-700">Ridha Fahmi</p><p className="text-zinc-400">{role}</p></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
+
       {/* ─── MAIN ─── */}
       <div className="flex flex-1 flex-col overflow-auto">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-zinc-200 bg-white/80 px-6 backdrop-blur">
-          <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-zinc-200 bg-white/80 px-4 backdrop-blur sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button onClick={() => setMobileNav(true)}
+              className="-ml-1 rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 lg:hidden" aria-label="Buka menu">
+              <span className="text-base">☰</span>
+            </button>
             <h1 className="text-sm font-medium text-zinc-500">{view}</h1>
-            {view !== "Dashboard" && <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-300">• {role}</span>}
+            {view !== "Dashboard" && <span className="hidden text-[10px] font-medium uppercase tracking-wider text-zinc-300 sm:inline">• {role}</span>}
           </div>
           <div className="relative flex items-center gap-2">
             {showNotifSuccess && (
@@ -153,7 +195,7 @@ export default function PrototypePage() {
 
         {/* NOTIFICATION DROPDOWN */}
         {showNotif && (
-          <div className="fixed right-6 top-14 z-30 w-80 rounded-xl border border-zinc-200 bg-white shadow-lg">
+          <div className="fixed right-2 top-14 z-30 w-[calc(100vw-1rem)] max-w-xs rounded-xl border border-zinc-200 bg-white shadow-lg sm:right-6 sm:w-80">
             <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
               <p className="text-xs font-semibold text-zinc-700">Notifikasi</p>
               <button onClick={() => setNotifs(n => n.map(x => ({...x, read:true})))} className="text-[10px] text-zinc-400 hover:text-zinc-600">Tandai semua dibaca</button>
@@ -168,7 +210,7 @@ export default function PrototypePage() {
           </div>
         )}
 
-        <main className="flex-1 px-6 py-8 lg:px-10 lg:py-10">
+        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
           {view === "Dashboard" && <Dash prs={prs} kontraks={kontraks} tagihans={tagihans} onNav={setView} />}
           {view === "Permintaan" && <PermintaanView prs={prs} role={role} formItems={formItems} setFormItems={setFormItems} showForm={showForm} setShowForm={setShowForm}
             addPermintaan={() => { const n={ id:`PR-${String(prs.length+43).padStart(3,"0")}`, unit:"IT", tgl:new Date().toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}), items:[...formItems], status:"Menunggu Validasi" as StatusPermintaan }; setPrs([n,...prs]); setFormItems([]); setShowForm(false); addNotif(`${n.id} diajukan oleh IT`, "Permintaan"); setShowNotifSuccess("Permintaan diajukan!"); setTimeout(()=>setShowNotifSuccess(""),2000); }}
@@ -242,8 +284,8 @@ function Dash({ prs, kontraks, tagihans, onNav }: { prs: Permintaan[]; kontraks:
         ))}
       </div>
       <h2 className="mb-4 text-lg font-semibold tracking-tight">Permintaan Terbaru</h2>
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-        <table className="w-full text-left text-sm"><thead><tr className="border-b border-zinc-100 bg-zinc-50/50">
+      <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+        <table className="w-full min-w-[640px] text-left text-sm"><thead><tr className="border-b border-zinc-100 bg-zinc-50/50">
           {["No","Unit","Tanggal","Item","Status"].map(h=><th key={h} className="px-5 py-3 text-xs font-medium uppercase tracking-wider text-zinc-400">{h}</th>)}
         </tr></thead><tbody>
           {prs.slice(0,4).map(r=><tr key={r.id} className="border-b border-zinc-50 hover:bg-zinc-50/50">
@@ -515,8 +557,8 @@ function TagihanView({ tagihans, kontraks, addTagihan }: any) {
           </div>
         </div>
       )}
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-        <table className="w-full text-left text-sm"><thead><tr className="border-b border-zinc-100 bg-zinc-50/50">
+      <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+        <table className="w-full min-w-[640px] text-left text-sm"><thead><tr className="border-b border-zinc-100 bg-zinc-50/50">
           {["No Tagihan","Supplier","Kontrak","Tanggal","Nominal","Berkas"].map(h=><th key={h} className="px-5 py-3 text-xs font-medium uppercase tracking-wider text-zinc-400">{h}</th>)}
         </tr></thead><tbody>
           {tagihans.map((t:any) => <tr key={t.id} className="border-b border-zinc-50 hover:bg-zinc-50/50">
@@ -669,8 +711,8 @@ function LaporanView({ prs, kontraks, tagihans }: any) {
    SHARED COMPONENTS
    ═══════════════════════════════════════════════ */
 function PRTable({ prs, onDetail }: any) {
-  return (<div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-    <table className="w-full text-left text-sm"><thead><tr className="border-b border-zinc-100 bg-zinc-50/50">
+  return (<div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+    <table className="w-full min-w-[640px] text-left text-sm"><thead><tr className="border-b border-zinc-100 bg-zinc-50/50">
       {["No","Unit","Tanggal","Item","Status",""].map(h=><th key={h} className="px-5 py-3 text-xs font-medium uppercase tracking-wider text-zinc-400">{h}</th>)}
     </tr></thead><tbody>
       {prs.map((r:Permintaan) => <tr key={r.id} className="border-b border-zinc-50 hover:bg-zinc-50/50">
