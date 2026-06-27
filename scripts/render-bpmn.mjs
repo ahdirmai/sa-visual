@@ -15,7 +15,7 @@ const html = `<!DOCTYPE html>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: white; font-family: Calibri, Arial, sans-serif; }
-  #canvas { width: 1500px; height: 900px; }
+  #canvas { width: 1900px; height: 850px; }
   .bjs-powered-by { display: none !important; }
   .djs-palette { display: none !important; }
   
@@ -62,7 +62,7 @@ const html = `<!DOCTYPE html>
 <div id="canvas"></div>
 <script>
 (async () => {
-  const viewer = new BpmnJS({ container: '#canvas', width: 1500, height: 900 });
+  const viewer = new BpmnJS({ container: '#canvas', width: 1900, height: 850 });
   try {
     await viewer.importXML(\`${bpmnXml.replace(/`/g, '\\`')}\`);
     const canvas = viewer.get('canvas');
@@ -94,7 +94,7 @@ async function main() {
   });
 
   const page = await browser.newPage();
-  await page.setViewport({ width: 1600, height: 1000 });
+  await page.setViewport({ width: 2000, height: 1000 });
 
   // Capture console logs
   page.on('console', msg => {
