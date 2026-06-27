@@ -53,7 +53,7 @@ export default function Home() {
             />
           </div>
           <p className="mt-6 text-sm text-zinc-400 text-center">
-            Use Case Diagram — 7 aktor, 15 use case
+            Use Case Diagram — 7 aktor, 13 use case + 2 interaksi Supplier offline
           </p>
         </Subsection>
 
@@ -248,7 +248,7 @@ export default function Home() {
               Buka Interactive Prototype
             </a>
             <p className="mt-3 text-sm text-zinc-400">
-              Prototype interaktif mencakup 7 role aktor dan 15 use case — simulasi alur pengadaan dari Unit Pemohon hingga Manager.
+              Prototype interaktif mencakup 7 role aktor dan 13 use case + 2 interaksi Supplier offline — simulasi alur pengadaan dari Unit Pemohon hingga Manager.
             </p>
           </div>
         </Subsection>
@@ -310,7 +310,7 @@ export default function Home() {
               Buka Interactive Prototype
             </a>
             <p className="mt-3 text-sm text-zinc-400">
-              Prototype interaktif mencakup 7 role aktor dan 15 use case — simulasi alur pengadaan dari Unit Pemohon hingga Manager.
+              Prototype interaktif mencakup 7 role aktor dan 13 use case + 2 interaksi Supplier offline — simulasi alur pengadaan dari Unit Pemohon hingga Manager.
             </p>
           </div>
         </Subsection>

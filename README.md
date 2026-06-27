@@ -35,7 +35,7 @@
 
 ### Section 1: Analisis Kebutuhan Sistem
 - **7 aktor** teridentifikasi (6 internal + 1 secondary actor)
-- **15 use case** mencakup seluruh siklus pengadaan
+- **13 use case** inti + 2 interaksi Supplier offline mencakup seluruh siklus pengadaan
 - **14 entitas** ERD dengan relasi 1:N dan 1:1
 - **11 kebutuhan fungsional** (F-01 s/d F-11)
 - Activity diagram dengan 2 decision gate
@@ -64,7 +64,7 @@
 Prototype interaktif tersedia di **[/prototype](https://sa-visual.ahdirmai.id/prototype)**:
 
 - **7 role aktor**: Unit Pemohon, Procurement, Budgeting, Keuangan, Kasir, Manager, Supplier
-- **15 use case** fully interactive
+- **13 use case** + 2 interaksi Supplier offline fully interactive
 - **Flow lengkap**: dari pengajuan permintaan hingga pencairan dana
 - **Real-time notifikasi** antar aktor
 - **Laporan PDF** per pengajuan
@@ -85,7 +85,7 @@ Prototype interaktif tersedia di **[/prototype](https://sa-visual.ahdirmai.id/pr
 
 1. Buka **https://sa-visual.ahdirmai.id**
 2. Scroll untuk lihat semua section (1-5)
-3. Klik **"Buka Prototype"** untuk interactive demo (7 role, 15 use cases)
+3. Klik **"Buka Prototype"** untuk interactive demo (7 role, 13 use cases + 2 interaksi Supplier offline)
 4. Klik **"Download Jawaban (.docx)"** untuk versi dokumen
 
 ---

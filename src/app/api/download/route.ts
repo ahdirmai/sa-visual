@@ -100,7 +100,7 @@ export async function GET() {
 
           subheading("1.1 Spesifikasi Kebutuhan Pengguna (Use Case)"),
           para("Tujuh aktor teridentifikasi dalam sistem pengadaan barang — 6 aktor internal (Unit Pemohon, Procurement, Budgeting, Keuangan, Kasir, Manager) dan 1 secondary actor (Supplier). Interaksi Supplier bersifat offline, dicatat/diinput oleh Procurement."),
-          para("15 use case mencakup seluruh siklus pengadaan:"),
+          para("13 use case inti + 2 interaksi Supplier offline mencakup seluruh siklus pengadaan:"),
           bullet("Unit Pemohon: Mengajukan Permintaan, Terima Notifikasi"),
           bullet("Procurement: Validasi Permintaan, Kirim Draft PO, Input Kontrak, Input Termin, Upload Bukti PO, Terima Barang & Tagihan"),
           bullet("Budgeting: Verifikasi Anggaran"),
@@ -110,7 +110,7 @@ export async function GET() {
           bullet("Supplier (Secondary Actor): Kirim PO, Kirim Barang & Tagihan — interaksi offline, dicatat oleh Procurement"),
 
           // Use Case Diagram Image
-          diagramImage(usecaseImg, "Use Case Diagram — 7 aktor, 15 use case"),
+          diagramImage(usecaseImg, "Use Case Diagram — 7 aktor, 13 use case + 2 interaksi Supplier offline"),
 
           subheading("1.1b Batasan Ruang Lingkup (Scope & Non-Scope)"),
           para("Scope (In-Scope):"),
