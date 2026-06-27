@@ -183,86 +183,15 @@ export default function Home() {
             14 entitas dengan relasi 1:N dan 1:1. PEMBAYARAN terhubung ke TERMIN_PEMBAYARAN
             via id_termin untuk trace realisasi pembayaran per termin pencairan dana.
           </p>
-          <MermaidDiagram
-            chart={`erDiagram
-    UNIT_PEMOHON ||--o{ PERMINTAAN : mengajukan
-    PERMINTAAN ||--o{ DETAIL_PERMINTAAN : "multi barang"
-    PERMINTAAN ||--|| VALIDASI_PROCUREMENT : divalidasi
-    VALIDASI_PROCUREMENT ||--|| VERIFIKASI_ANGGARAN : diteruskan
-    PERMINTAAN ||--o{ NOTIFIKASI : menghasilkan
-
-    PERMINTAAN ||--o{ KONTRAK : menghasilkan
-    KONTRAK ||--o{ DETAIL_KONTRAK : "multi barang"
-    KONTRAK ||--o{ TERMIN_PEMBAYARAN : "multi termin"
-
-    KONTRAK ||--o{ TAGIHAN : ditagihkan
-    TAGIHAN ||--o{ DETAIL_TAGIHAN : "multi barang"
-    TAGIHAN ||--o{ PEMBAYARAN : dilunasi
-    TERMIN_PEMBAYARAN ||--o{ PEMBAYARAN : "realisasi termin"
-
-    SUPPLIER ||--o{ KONTRAK : menyediakan
-    SUPPLIER ||--o{ TAGIHAN : mengirimkan
-
-    USER ||--o{ PERMINTAAN : membuat
-    USER ||--o{ NOTIFIKASI : menerima
-
-    UNIT_PEMOHON {
-        int id_unit PK
-        string nama_unit
-        string kode
-    }
-    PERMINTAAN {
-        int id_permintaan PK
-        int id_unit FK
-        date tgl_pengajuan
-        enum status
-    }
-    DETAIL_PERMINTAAN {
-        int id_detail PK
-        int id_permintaan FK
-        string nama_barang
-        int jumlah
-        string satuan
-    }
-    KONTRAK {
-        int id_kontrak PK
-        int id_permintaan FK
-        int id_supplier FK
-        string no_kontrak
-        date tgl_kontrak
-    }
-    TERMIN_PEMBAYARAN {
-        int id_termin PK
-        int id_kontrak FK
-        date tgl_pembayaran
-        decimal persentase
-        decimal nominal
-    }
-    TAGIHAN {
-        int id_tagihan PK
-        int id_kontrak FK
-        date tgl_tagihan
-        string no_tagihan
-    }
-    PEMBAYARAN {
-        int id_pembayaran PK
-        int id_tagihan FK
-        int id_termin FK
-        date tgl_pembayaran
-        decimal nominal
-        decimal total
-    }
-    SUPPLIER {
-        int id_supplier PK
-        string nama
-        string npwp
-    }
-    USER {
-        int id_user PK
-        string username
-        enum role
-    }`}
-          />
+          <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white p-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/diagrams/erDiagram.png"
+              alt="ERD — Skema Database Sistem Pengadaan Barang"
+              className="mx-auto h-auto w-full max-w-[1100px]"
+              style={{ minWidth: "600px" }}
+            />
+          </div>
           <p className="mt-2 text-sm text-zinc-400 text-center">
             ERD — 14 entitas dengan relasi dan atribut kunci
           </p>
