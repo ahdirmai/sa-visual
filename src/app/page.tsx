@@ -188,7 +188,7 @@ export default function Home() {
             <img
               src="/diagrams/erDiagram.png"
               alt="ERD — Skema Database Sistem Pengadaan Barang"
-              className="mx-auto h-auto w-full max-w-[1100px]"
+              className="mx-auto h-auto w-full max-w-[900px]"
               style={{ minWidth: "600px" }}
             />
           </div>

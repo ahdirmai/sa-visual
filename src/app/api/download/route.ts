@@ -18,6 +18,15 @@ import {
 import { readFileSync } from "fs";
 import { join } from "path";
 
+// Read PNG intrinsic dimensions from IHDR chunk (bytes 16-24)
+function pngSize(buf: Buffer): { w: number; h: number } {
+  if (buf.length < 24) return { w: 600, h: 300 };
+  const w = buf.readUInt32BE(16);
+  const h = buf.readUInt32BE(20);
+  if (!w || !h) return { w: 600, h: 300 };
+  return { w, h };
+}
+
 // Load diagram images
 function loadDiagram(name: string): Buffer {
   try {
@@ -402,18 +411,24 @@ function diagramImage(buf: Buffer, caption: string) {
   if (buf.length === 0) {
     return para(`[Diagram: ${caption}]`);
   }
-  // Calculate dimensions: maintain aspect ratio, max width ~6 inches (900000 EMU)
-  const maxWidthEmu = 550000; // ~6 inches
+  // Maintain real aspect ratio. Fit within usable A4 portrait area
+  // (margins 1in → ~6.3in wide max, cap height for tall/portrait diagrams).
+  const { w, h } = pngSize(buf);
+  const MAX_W = 600; // px-equivalent, ~6.25in
+  const MAX_H = 760; // cap so portrait ERD fits one page
+  let width = MAX_W;
+  let height = Math.round((MAX_W * h) / w);
+  if (height > MAX_H) {
+    height = MAX_H;
+    width = Math.round((MAX_H * w) / h);
+  }
   return new Paragraph({
     alignment: AlignmentType.CENTER,
     spacing: { before: 200, after: 100 },
     children: [
       new ImageRun({
         data: buf,
-        transformation: {
-          width: 600,
-          height: 300,
-        },
+        transformation: { width, height },
         type: "png",
       }),
     ],
