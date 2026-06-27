@@ -141,56 +141,19 @@ export default function Home() {
           </p>
 
           <h4 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">
-            Alur Bisnis — Swimlane
+            Alur Bisnis — BPMN (Business Process Model and Notation)
           </h4>
-          <MermaidDiagram
-            chart={`sequenceDiagram
-    actor UP as Unit Pemohon
-    actor PP as Procurement
-    actor PB as Budgeting
-    actor PK as Keuangan
-    actor KS as Kasir
-    actor SP as Supplier
-
-    UP->>PP: 1. Ajukan Permintaan Barang
-    Note right of PP: tgl, nama barang, jumlah
-    
-    PP->>PP: 2. Validasi Kebutuhan
-    
-    alt Ditolak
-        PP-->>UP: Notifikasi Penolakan
-    else Disetujui
-        PP->>PB: 3. Verifikasi Anggaran
-        PB->>PB: Cek Ketersediaan Budget
-        
-        alt Anggaran Habis
-            PB-->>UP: Notifikasi Budget Tidak Cukup
-        else Anggaran Tersedia
-            PB-->>PP: Budget OK
-            PP->>SP: 4. Kirim Draft PO
-            SP-->>PP: 5. Kirim PO Resmi
-            
-            PP->>PP: 6. Input Kontrak & Termin
-            Note right of PP: no kontrak, harga, termin
-            
-            PP->>PP: 7. Upload Bukti PO
-            
-            SP->>PP: 8. Kirim Barang + Tagihan
-            PP->>PK: 9. Teruskan Tagihan
-            
-            PK->>PK: 10. Input Data Tagihan
-            PK->>PK: 11. Upload Berkas
-            
-            PK->>KS: 12. Notifikasi Pencairan
-            KS->>KS: 13. Input Pembayaran
-            Note right of KS: tgl bayar, nominal, total
-            
-            PP->>PP: 14. Generate Laporan
-        end
-    end`}
-          />
+          <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white p-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/diagrams/bpmn.png"
+              alt="BPMN Diagram — Alur Proses Pengadaan Barang"
+              className="mx-auto h-auto w-full max-w-[1200px]"
+              style={{ minWidth: "800px" }}
+            />
+          </div>
           <p className="mt-2 text-sm text-zinc-400 text-center">
-            Sequence Diagram — 14 langkah alur pengadaan
+            BPMN Diagram — 6 lane, 2 decision gateway, 14 langkah alur pengadaan
           </p>
 
           <h4 className="mb-4 mt-10 text-sm font-semibold uppercase tracking-wider text-zinc-400">

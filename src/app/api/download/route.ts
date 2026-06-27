@@ -28,7 +28,7 @@ function loadDiagram(name: string): Buffer {
 }
 
 const usecaseImg = loadDiagram("usecase");
-const sequenceImg = loadDiagram("sequence");
+const bpmnImg = loadDiagram("bpmn");
 const erdImg = loadDiagram("erDiagram");
 const activityImg = loadDiagram("activity");
 
@@ -160,7 +160,7 @@ export async function GET() {
           bullet("14. Manager generate Laporan"),
 
           // Sequence Diagram Image
-          diagramImage(sequenceImg, "Alur Bisnis — Swimlane (14 langkah alur pengadaan)"),
+          diagramImage(bpmnImg, "Alur Bisnis — BPMN (Business Process Model and Notation)"),
 
           para("11 Kebutuhan Fungsional:"),
           simpleTable(
