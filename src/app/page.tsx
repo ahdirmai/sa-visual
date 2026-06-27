@@ -215,38 +215,15 @@ export default function Home() {
             Activity diagram menggambarkan alur proses permintaan barang dengan
             decision point di setiap tahap validasi.
           </p>
-          <MermaidDiagram
-            chart={`graph TD
-    START([Start]) --> A
-
-    A[Unit Pemohon:<br/>Input Permintaan Barang] --> B
-
-    B{Procurement:<br/>Validasi Kebutuhan?}
-    B -->|Ditolak| C[Notifikasi<br/>Penolakan ke Pemohon]
-    C --> END1([End])
-    B -->|Disetujui| D
-
-    D{Budgeting:<br/>Anggaran Tersedia?}
-    D -->|Tidak| E[Notifikasi<br/>Budget Tidak Cukup]
-    E --> END2([End])
-    D -->|Ya| F
-
-    F[Procurement:<br/>Kirim Draft PO ke Supplier] --> G
-    G[Supplier:<br/>Kirim PO Resmi] --> H
-    H[Procurement:<br/>Input Kontrak<br/>+ Termin Pembayaran] --> I
-    I[Supplier:<br/>Kirim Barang + Tagihan] --> J
-    J[Keuangan:<br/>Input Data Tagihan<br/>+ Upload Berkas] --> K
-    K[Kasir:<br/>Cairkan Dana<br/>Pembayaran] --> END3([End])
-
-    style START fill:#f0fdf4,stroke:#22c55e,color:#166534
-    style END1 fill:#fef2f2,stroke:#ef4444,color:#991b1b
-    style END2 fill:#fef2f2,stroke:#ef4444,color:#991b1b
-    style END3 fill:#f0fdf4,stroke:#22c55e,color:#166534
-    style C fill:#fef2f2,stroke:#fca5a5,color:#991b1b
-    style E fill:#fef2f2,stroke:#fca5a5,color:#991b1b
-    style B fill:#eff6ff,stroke:#3b82f6,color:#1e40af
-    style D fill:#eff6ff,stroke:#3b82f6,color:#1e40af`}
-          />
+          <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white p-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/diagrams/activity.png"
+              alt="Activity Diagram — Alur Permintaan dengan decision point"
+              className="mx-auto h-auto w-full max-w-[600px]"
+              style={{ minWidth: "320px" }}
+            />
+          </div>
           <p className="mt-2 text-sm text-zinc-400 text-center">
             Activity Diagram — Alur Permintaan dengan 2 decision gate
           </p>
