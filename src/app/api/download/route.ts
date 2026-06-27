@@ -11,7 +11,26 @@ import {
   AlignmentType,
   HeadingLevel,
   BorderStyle,
+  ImageRun,
+  PageOrientation,
+  convertInchesToTwip,
 } from "docx";
+import { readFileSync } from "fs";
+import { join } from "path";
+
+// Load diagram images
+function loadDiagram(name: string): Buffer {
+  try {
+    return readFileSync(join(process.cwd(), "public", "diagrams", `${name}.png`));
+  } catch {
+    return Buffer.alloc(0);
+  }
+}
+
+const usecaseImg = loadDiagram("usecase");
+const sequenceImg = loadDiagram("sequence");
+const erdImg = loadDiagram("erDiagram");
+const activityImg = loadDiagram("activity");
 
 export async function GET() {
   const doc = new Document({
@@ -24,7 +43,16 @@ export async function GET() {
     },
     sections: [
       {
-        properties: {},
+        properties: {
+          page: {
+            margin: {
+              top: convertInchesToTwip(1),
+              right: convertInchesToTwip(1),
+              bottom: convertInchesToTwip(1),
+              left: convertInchesToTwip(1),
+            },
+          },
+        },
         children: [
           // HERO
           new Paragraph({
@@ -72,6 +100,47 @@ export async function GET() {
           bullet("Manager: Generate Laporan"),
           bullet("Supplier (Secondary Actor): Kirim PO, Kirim Barang & Tagihan — interaksi offline, dicatat oleh Procurement"),
 
+          // Use Case Diagram Image
+          diagramImage(usecaseImg, "Use Case Diagram — 7 aktor, 15 use case"),
+
+          subheading("1.1b Batasan Ruang Lingkup (Scope & Non-Scope)"),
+          para("Scope (In-Scope):"),
+          bullet("Pencatatan permintaan barang dari Unit Pemohon"),
+          bullet("Validasi dan approval oleh Procurement"),
+          bullet("Verifikasi ketersediaan anggaran oleh Budgeting"),
+          bullet("Pembuatan kontrak dan termin pembayaran oleh Procurement"),
+          bullet("Pencatatan data tagihan dan upload berkas oleh Keuangan"),
+          bullet("Pencairan dana oleh Kasir"),
+          bullet("Monitoring dan laporan oleh Manager"),
+          bullet("Notifikasi antar-aktor dalam sistem"),
+
+          para("Non-Scope (Out-of-Scope):"),
+          bullet("Pengiriman Draft PO ke vendor/supplier (terjadi di luar aplikasi, dicatat oleh Procurement)"),
+          bullet("Penerimaan PO dan pengiriman barang oleh Supplier (offline, diinput oleh Procurement)"),
+          bullet("Integrasi dengan sistem akuntansi/ERP eksternal"),
+          bullet("Manajemen inventaris/aset setelah barang diterima"),
+          bullet("Sistem pembayaran elektronik (transfer bank)"),
+
+          subheading("1.1c Status Workflow Pengadaan"),
+          simpleTable(
+            ["No", "Status", "Deskripsi", "Aktor"],
+            [
+              ["1", "Draft", "Permintaan dibuat, belum diajukan", "Unit Pemohon"],
+              ["2", "Submitted", "Permintaan diajukan ke Procurement", "Unit Pemohon"],
+              ["3", "Procurement Approved", "Disetujui oleh Procurement", "Procurement"],
+              ["4", "Procurement Rejected", "Ditolak oleh Procurement (dengan alasan)", "Procurement"],
+              ["5", "Budget Approved", "Anggaran tersedia", "Budgeting"],
+              ["6", "Budget Rejected", "Anggaran tidak tersedia", "Budgeting"],
+              ["7", "Contract Created", "Kontrak dan termin dibuat", "Procurement"],
+              ["8", "PO Sent", "Draft PO dikirim ke supplier", "Procurement"],
+              ["9", "PO Accepted", "Supplier menerima PO", "Supplier (offline)"],
+              ["10", "Goods Received", "Barang diterima dan diverifikasi", "Procurement"],
+              ["11", "Invoice Received", "Tagihan dan berkas diterima", "Keuangan"],
+              ["12", "Payment Processed", "Termin pembayaran dicairkan", "Kasir"],
+              ["13", "Closed", "Seluruh proses selesai", "Sistem"],
+            ]
+          ),
+
           subheading("1.2 Flow Diagram & Kebutuhan Fungsional"),
           para("Alur proses bisnis pengadaan barang dari permintaan hingga pembayaran, melibatkan 6 aktor internal dan 1 secondary actor eksternal."),
           para("Alur Bisnis (14 langkah):"),
@@ -89,6 +158,9 @@ export async function GET() {
           bullet("12. Keuangan notifikasi Pencairan ke Kasir"),
           bullet("13. Kasir input Pembayaran (tgl bayar, nominal, total)"),
           bullet("14. Manager generate Laporan"),
+
+          // Sequence Diagram Image
+          diagramImage(sequenceImg, "Alur Bisnis — Swimlane (14 langkah alur pengadaan)"),
 
           para("11 Kebutuhan Fungsional:"),
           simpleTable(
@@ -110,6 +182,10 @@ export async function GET() {
 
           subheading("1.3 Entity Relationship Diagram (ERD)"),
           para("14 entitas dengan relasi 1:N dan 1:1. PEMBAYARAN terhubung ke TERMIN_PEMBAYARAN via id_termin untuk trace realisasi pembayaran per termin pencairan dana."),
+
+          // ERD Image
+          diagramImage(erdImg, "ERD — 14 entitas dengan relasi dan atribut kunci"),
+
           para("Relasi Kunci:"),
           bullet("Unit Pemohon 1→N Permintaan → Detail Permintaan"),
           bullet("Permintaan 1→1 Validasi → 1 Verifikasi Anggaran"),
@@ -140,7 +216,24 @@ export async function GET() {
           para("Activity diagram menggambarkan alur proses permintaan barang dengan 2 decision point:"),
           bullet("Decision 1: Procurement — Validasi Kebutuhan (Disetujui / Ditolak)"),
           bullet("Decision 2: Budgeting — Anggaran Tersedia (Ya / Tidak)"),
-          para("Alur: Start → Input Permintaan → Validasi Procurement → Verifikasi Anggaran → Kirim Draft PO → Input Kontrak → Terima Barang + Tagihan → Input Tagihan → Cairkan Dana → End"),
+
+          // Activity Diagram Image
+          diagramImage(activityImg, "Activity Diagram — Alur Permintaan dengan 2 decision gate"),
+
+          subheading("1.4b Kebutuhan Non-Fungsional"),
+          simpleTable(
+            ["ID", "Kategori", "Kebutuhan", "Spesifikasi"],
+            [
+              ["NF-01", "Keamanan", "Role-Based Access Control (RBAC)", "7 role dengan akses terbatas per modul"],
+              ["NF-02", "Keamanan", "Audit Trail", "Log setiap approval/rejection dengan timestamp, user, dan alasan"],
+              ["NF-03", "Keamanan", "Keamanan Dokumen", "Enkripsi file upload (tagihan, PO) di storage"],
+              ["NF-04", "Keandalan", "Backup Database", "Backup otomatis harian dengan retensi 30 hari"],
+              ["NF-05", "Keandalan", "Upload Validasi", "Maks 5MB, format PDF/JPG/PNG, virus scan"],
+              ["NF-06", "Performa", "Response Time", "Halaman < 2 detik, laporan < 5 detik"],
+              ["NF-07", "Performa", "Concurrent Users", "Minimal 50 user simultan"],
+              ["NF-08", "Maintainability", "Dokumentasi", "FSD, TSD, API docs, user manual"],
+            ]
+          ),
 
           subheading("1.5 Desain Interface / Mockup"),
           para("Komponen UI Back Office yang diusulkan:"),
@@ -150,6 +243,7 @@ export async function GET() {
           bullet("Form Input: Validasi client + server, multi-item dynamic fields"),
           bullet("Upload: Drag & drop, preview PDF/JPG, max 5MB"),
           bullet("Notifikasi: Badge counter + toast popup real-time"),
+          para("Interactive prototype tersedia di: https://sa-visual.ahdirmai.id/prototype"),
 
           // SECTION 2
           heading("Section 2: Model Proses Pengembangan (25 Poin)"),
@@ -192,13 +286,16 @@ export async function GET() {
               ["4", "Frontend Developer", "1", "UI/UX back office, implementasi mockup"],
               ["5", "QA / Tester", "1", "Test case, regression test, bug reporting"],
               ["6", "Database Administrator", "1", "DB schema, indexing, optimization, backup"],
+              ["7", "UI/UX Designer", "1", "Desain interface, wireframe, prototype, usability testing"],
+              ["8", "DevOps / Infra Engineer", "1", "CI/CD pipeline, server, monitoring, deployment"],
+              ["9", "Product Owner / User Rep.", "1", "Representasi kebutuhan user, acceptance criteria, sprint review"],
             ]
           ),
-          para("Total: 7 orang"),
+          para("Total: 10 orang"),
 
           // SECTION 4
           heading("Section 4: Penjadwalan Proyek (10 Poin)"),
-          para("Timeline 3 bulan (12 minggu) dengan 4 sprint 2-mingguan, 6 milestone, dan buffer 1 minggu untuk unexpected issues."),
+          para("Timeline 3 bulan (12 minggu) dengan 4 sprint 2-mingguan, 6 milestone, dan buffer 1 minggu untuk mengantisipasi kendala teknis."),
           bullet("Sprint 1 (W3-4): Modul Permintaan + Validasi"),
           bullet("Sprint 2 (W5-6): Modul Budgeting + Kontrak"),
           bullet("Sprint 3 (W7-8): Modul Tagihan + Pembayaran"),
@@ -211,16 +308,16 @@ export async function GET() {
           subheading("Sisi Teknis"),
           bullet("1. Database harus support multi-item per transaksi — risiko: user input berulang & data tidak akurat"),
           bullet("2. Upload dokumen harus ada validasi (max 5MB, PDF/JPG) — risiko: storage penuh dan file korup"),
-          bullet("3. Role-based access control — risiko: kebocoran data sensitif, audit failure"),
-          bullet("4. Notifikasi real-time via sistem — risiko: bottleneck di validasi manual, project delay"),
-          bullet("5. Backup database harian — risiko: data keuangan hilang, audit failure"),
+          bullet("3. Role-based access control — risiko: kebocoran data sensitif, risiko kegagalan audit"),
+          bullet("4. Notifikasi real-time via sistem — risiko: bottleneck di validasi manual, keterlambatan proyek"),
+          bullet("5. Backup database harian — risiko: kehilangan data keuangan yang berdampak pada kegagalan audit"),
 
           subheading("Sisi Manajerial"),
-          bullet("1. Sign-off FSD dari semua stakeholder sebelum mulai coding — risiko: scope creep"),
-          bullet("2. Demo sprint setiap 2 minggu ke user — risiko: mismatch ekspektasi, rework besar"),
-          bullet("3. Training user minimal 1 minggu sebelum go-live — risiko: resistance & kesalahan input"),
-          bullet("4. Dedicated QA sejak Sprint 1 — risiko: bug menumpuk, go-live tertunda"),
-          bullet("5. Buffer 1 minggu untuk unexpected issues — risiko: tanpa buffer, deadline pasti meleset"),
+          bullet("1. Sign-off FSD dari semua stakeholder sebelum mulai coding — risiko: perubahan lingkup yang tidak terkendali"),
+          bullet("2. Demo sprint setiap 2 minggu ke user — risiko: ketidaksesuaian ekspektasi yang berpotensi menghasilkan pekerjaan ulang signifikan"),
+          bullet("3. Training user minimal 1 minggu sebelum go-live — risiko: resistansi pengguna dan potensi kesalahan input data"),
+          bullet("4. Dedicated QA sejak Sprint 1 — risiko: akumulasi defect berpotensi menunda jadwal go-live"),
+          bullet("5. Buffer 1 minggu untuk mengantisipasi kendala — risiko: keterlambatan meningkat apabila tidak tersedia buffer waktu"),
 
           // FOOTER
           new Paragraph({ spacing: { before: 600 } }),
@@ -297,6 +394,28 @@ function bullet(text: string) {
     children: [
       new TextRun({ text: "• ", size: 22 }),
       new TextRun({ text, size: 22 }),
+    ],
+  });
+}
+
+function diagramImage(buf: Buffer, caption: string) {
+  if (buf.length === 0) {
+    return para(`[Diagram: ${caption}]`);
+  }
+  // Calculate dimensions: maintain aspect ratio, max width ~6 inches (900000 EMU)
+  const maxWidthEmu = 550000; // ~6 inches
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 200, after: 100 },
+    children: [
+      new ImageRun({
+        data: buf,
+        transformation: {
+          width: 600,
+          height: 300,
+        },
+        type: "png",
+      }),
     ],
   });
 }
