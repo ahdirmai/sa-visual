@@ -1,5 +1,3 @@
-import MermaidDiagram from "@/components/MermaidDiagram";
-
 export default function Home() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-24 sm:py-32">
@@ -46,39 +44,14 @@ export default function Home() {
             (Unit Pemohon, Procurement, Budgeting, Keuangan, Kasir, Manager) dan 1 secondary actor
             (Supplier). Interaksi Supplier bersifat offline, dicatat/diinput oleh Procurement.
           </p>
-          <MermaidDiagram
-            chart={`graph LR
-    UP["🏢 Unit Pemohon"]
-    PP["📋 Procurement"]
-    PB["💰 Budgeting"]
-    PK["📊 Keuangan"]
-    KS["🏦 Kasir"]
-    MG["📈 Manager"]
-    SP[("🚚 Supplier<br/><i>Secondary Actor</i>")]
-
-    UP --> UC1(("Mengajukan<br/>Permintaan"))
-    UP --> UC2(("Terima<br/>Notifikasi"))
-
-    PP --> UC3(("Validasi<br/>Permintaan"))
-    PP --> UC4(("Kirim Draft<br/>PO ke Vendor"))
-    PP --> UC5(("Input<br/>Kontrak"))
-    PP --> UC6(("Input Termin<br/>Pembayaran"))
-    PP --> UC7(("Upload<br/>Bukti PO"))
-    PP --> UC8(("Terima Barang<br/>& Tagihan"))
-
-    PB --> UC9(("Verifikasi<br/>Anggaran"))
-    PB --> UC2
-
-    PK --> UC10(("Input Data<br/>Tagihan"))
-    PK --> UC11(("Upload Berkas<br/>Tagihan"))
-
-    KS --> UC12(("Cairkan Dana<br/>Pembayaran"))
-
-    MG --> UC13(("Generate<br/>Laporan"))
-
-    PP -.->|"PO offline"| SP
-    SP -.->|"Barang + Tagihan"| PP`}
-          />
+          <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white p-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/diagrams/usecase.png"
+              alt="Use Case Diagram — Sistem Pengadaan Barang"
+              className="mx-auto h-auto w-full max-w-[760px]"
+            />
+          </div>
           <p className="mt-6 text-sm text-zinc-400 text-center">
             Use Case Diagram — 7 aktor, 15 use case
           </p>
