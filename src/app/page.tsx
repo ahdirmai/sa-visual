@@ -84,6 +84,55 @@ export default function Home() {
           </p>
         </Subsection>
 
+        {/* 1.1b Scope & Non-Scope */}
+        <Subsection title="1.1b Batasan Ruang Lingkup (Scope & Non-Scope)">
+          <h4 className="mb-3 mt-2 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            Scope (In-Scope)
+          </h4>
+          <ul className="mb-6 space-y-2 text-sm text-zinc-600">
+            <li>• Pencatatan permintaan barang dari Unit Pemohon</li>
+            <li>• Validasi dan approval oleh Procurement</li>
+            <li>• Verifikasi ketersediaan anggaran oleh Budgeting</li>
+            <li>• Pembuatan kontrak dan termin pembayaran oleh Procurement</li>
+            <li>• Pencatatan data tagihan dan upload berkas oleh Keuangan</li>
+            <li>• Pencairan dana oleh Kasir</li>
+            <li>• Monitoring dan laporan oleh Manager</li>
+            <li>• Notifikasi antar-aktor dalam sistem</li>
+          </ul>
+          <h4 className="mb-3 mt-2 text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            Non-Scope (Out-of-Scope)
+          </h4>
+          <ul className="space-y-2 text-sm text-zinc-600">
+            <li>• Pengiriman Draft PO ke vendor/supplier (terjadi di luar aplikasi, dicatat oleh Procurement)</li>
+            <li>• Penerimaan PO dan pengiriman barang oleh Supplier (offline, diinput oleh Procurement)</li>
+            <li>• Integrasi dengan sistem akuntansi/ERP eksternal</li>
+            <li>• Manajemen inventaris/aset setelah barang diterima</li>
+            <li>• Sistem pembayaran elektronik (transfer bank)</li>
+          </ul>
+        </Subsection>
+
+        {/* 1.1c Workflow Status */}
+        <Subsection title="1.1c Status Workflow Pengadaan">
+          <Table
+            headers={["No", "Status", "Deskripsi", "Aktor"]}
+            rows={[
+              ["1", "Draft", "Permintaan dibuat, belum diajukan", "Unit Pemohon"],
+              ["2", "Submitted", "Permintaan diajukan ke Procurement", "Unit Pemohon"],
+              ["3", "Procurement Approved", "Disetujui oleh Procurement", "Procurement"],
+              ["4", "Procurement Rejected", "Ditolak oleh Procurement (dengan alasan)", "Procurement"],
+              ["5", "Budget Approved", "Anggaran tersedia", "Budgeting"],
+              ["6", "Budget Rejected", "Anggaran tidak tersedia", "Budgeting"],
+              ["7", "Contract Created", "Kontrak dan termin dibuat", "Procurement"],
+              ["8", "PO Sent", "Draft PO dikirim ke supplier", "Procurement"],
+              ["9", "PO Accepted", "Supplier menerima PO", "Supplier (offline)"],
+              ["10", "Goods Received", "Barang diterima dan diverifikasi", "Procurement"],
+              ["11", "Invoice Received", "Tagihan dan berkas diterima", "Keuangan"],
+              ["12", "Payment Processed", "Termin pembayaran dicairkan", "Kasir"],
+              ["13", "Closed", "Seluruh proses selesai", "Sistem"],
+            ]}
+          />
+        </Subsection>
+
         {/* 1.2 Flow + Functional */}
         <Subsection title="1.2 Flow Diagram & Kebutuhan Fungsional">
           <p className="mb-6 leading-relaxed text-zinc-600">
@@ -311,6 +360,23 @@ export default function Home() {
           </p>
         </Subsection>
 
+        {/* 1.4b Non-Functional Requirements */}
+        <Subsection title="1.4b Kebutuhan Non-Fungsional">
+          <Table
+            headers={["ID", "Kategori", "Kebutuhan", "Spesifikasi"]}
+            rows={[
+              ["NF-01", "Keamanan", "Role-Based Access Control (RBAC)", "7 role dengan akses terbatas per modul"],
+              ["NF-02", "Keamanan", "Audit Trail", "Log setiap approval/rejection dengan timestamp, user, dan alasan"],
+              ["NF-03", "Keamanan", "Keamanan Dokumen", "Enkripsi file upload (tagihan, PO) di storage"],
+              ["NF-04", "Keandalan", "Backup Database", "Backup otomatis harian dengan retensi 30 hari"],
+              ["NF-05", "Keandalan", "Upload Validasi", "Maks 5MB, format PDF/JPG/PNG, virus scan"],
+              ["NF-06", "Performa", "Response Time", "Halaman < 2 detik, laporan < 5 detik"],
+              ["NF-07", "Performa", "Concurrent Users", "Minimal 50 user simultan"],
+              ["NF-08", "Maintainability", "Dokumentasi", "FSD, TSD, API docs, user manual"],
+            ]}
+          />
+        </Subsection>
+
         {/* 1.5 Mockup */}
         <Subsection title="1.5 Desain Interface / Mockup">
           <p className="mb-6 leading-relaxed text-zinc-600">
@@ -421,8 +487,11 @@ export default function Home() {
             ["4", "Frontend Developer", "1", "UI/UX back office, implementasi mockup"],
             ["5", "QA / Tester", "1", "Test case, regression test, bug reporting"],
             ["6", "Database Administrator", "1", "DB schema, indexing, optimization, backup"],
+            ["7", "UI/UX Designer", "1", "Desain interface, wireframe, prototype, usability testing. Skill: Figma, design system, user research"],
+            ["8", "DevOps/Infra Engineer", "1", "CI/CD pipeline, server management, monitoring, deployment. Skill: Docker, Linux, Nginx, SSL, backup automation"],
+            ["9", "Product Owner / User Representative", "1", "Representasi kebutuhan user procurement & finance, acceptance criteria, sprint review. Skill: Domain knowledge pengadaan, komunikasi stakeholder"],
           ]}
-          footer="Total: 7 orang"
+          footer="Total: 10 orang"
         />
       </Section>
 
@@ -478,7 +547,7 @@ export default function Home() {
               { id: 2, title: "Upload dokumen harus ada validasi (max 5MB, PDF/JPG)", risk: "Storage penuh dan file korup" },
               { id: 3, title: "Role-based access control — Unit Pemohon ≠ modul Keuangan", risk: "Kebocoran data sensitif — risiko audit" },
               { id: 4, title: "Notifikasi real-time via sistem (bukan email)", risk: "Bottleneck di validasi manual — project delay" },
-              { id: 5, title: "Backup database harian", risk: "Data keuangan hilang — audit failure" },
+              { id: 5, title: "Backup database harian", risk: "Risiko kehilangan data keuangan yang berdampak pada kegagalan audit" },
             ].map(({ id, title, risk }) => (
               <div key={id} className="flex gap-4">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-500">{id}</span>
@@ -495,11 +564,11 @@ export default function Home() {
           <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-400">Sisi Manajerial</h4>
           <div className="space-y-4">
             {[
-              { id: 1, title: "Sign-off FSD dari semua stakeholder sebelum mulai coding", risk: "Scope creep, revisi tak berujung" },
-              { id: 2, title: "Demo sprint setiap 2 minggu ke user — bukan tunggu UAT akhir", risk: "Mismatch ekspektasi → rework besar" },
-              { id: 3, title: "Training user minimal 1 minggu sebelum go-live", risk: "Resistance & kesalahan input" },
-              { id: 4, title: "Dedicated QA sejak Sprint 1 — bukan cuma tes di akhir", risk: "Bug menumpuk → go-live tertunda" },
-              { id: 5, title: "Buffer 1 minggu untuk unexpected issues", risk: "Tanpa buffer, deadline PASTI meleset" },
+              { id: 1, title: "Sign-off FSD dari semua stakeholder sebelum mulai coding", risk: "Risiko perubahan lingkup yang tidak terkendali" },
+              { id: 2, title: "Demo sprint setiap 2 minggu ke user — bukan tunggu UAT akhir", risk: "Ketidaksesuaian ekspektasi yang berpotensi menghasilkan pekerjaan ulang signifikan" },
+              { id: 3, title: "Training user minimal 1 minggu sebelum go-live", risk: "Resistansi pengguna dan potensi kesalahan input data" },
+              { id: 4, title: "Dedicated QA sejak Sprint 1 — bukan cuma tes di akhir", risk: "Akumulasi defect berpotensi menunda jadwal go-live" },
+              { id: 5, title: "Buffer 1 minggu untuk unexpected issues", risk: "risiko keterlambatan meningkat apabila tidak tersedia buffer waktu" },
             ].map(({ id, title, risk }) => (
               <div key={id} className="flex gap-4">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-500">{id}</span>
