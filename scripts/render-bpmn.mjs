@@ -15,11 +15,43 @@ const html = `<!DOCTYPE html>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: white; font-family: Calibri, Arial, sans-serif; }
-  #canvas { width: 1400px; height: 900px; }
+  #canvas { width: 1500px; height: 900px; }
   .bjs-powered-by { display: none !important; }
-  .djs-element .djs-label { font-size: 11px !important; font-family: Calibri, Arial, sans-serif !important; }
-  .djs-element .djs-visual text { font-size: 11px !important; font-family: Calibri, Arial, sans-serif !important; }
   .djs-palette { display: none !important; }
+  
+  /* Ensure arrows and flows are visible */
+  .djs-connection { visibility: visible !important; }
+  .djs-connection .djs-visual { visibility: visible !important; }
+  .djs-connection .djs-visual path { 
+    visibility: visible !important; 
+    stroke: #333 !important; 
+    stroke-width: 1.5px !important;
+    fill: none !important;
+  }
+  .djs-connection .djs-visual polyline {
+    stroke: #333 !important;
+    stroke-width: 1.5px !important;
+    fill: #333 !important;
+  }
+  .djs-connection .djs-visual polygon {
+    fill: #333 !important;
+    stroke: #333 !important;
+  }
+  .djs-arrow {
+    fill: #333 !important;
+    stroke: #333 !important;
+  }
+  
+  /* Labels */
+  .djs-label { font-size: 11px !important; fill: #333 !important; }
+  .djs-element .djs-label { font-size: 11px !important; }
+  .djs-element .djs-visual text { font-size: 11px !important; }
+  
+  /* Lane styling */
+  .djs-group .djs-hit { stroke: #999 !important; stroke-width: 0.5px !important; }
+  
+  /* Task styling */
+  .djs-element[data-element-id] rect { rx: 8; ry: 8; }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/diagram-js.css">
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/bpmn-js.css">
@@ -30,14 +62,23 @@ const html = `<!DOCTYPE html>
 <div id="canvas"></div>
 <script>
 (async () => {
-  const viewer = new BpmnJS({ container: '#canvas', width: 1400, height: 900 });
+  const viewer = new BpmnJS({ container: '#canvas', width: 1500, height: 900 });
   try {
     await viewer.importXML(\`${bpmnXml.replace(/`/g, '\\`')}\`);
     const canvas = viewer.get('canvas');
     canvas.zoom('fit-viewport', 'auto');
+    
+    // Force render all connections
+    const elementRegistry = viewer.get('elementRegistry');
+    elementRegistry.forEach(el => {
+      if (el.waypoints) {
+        canvas.addMarker(el.id, 'djs-connection');
+      }
+    });
+    
     window.__bpmnReady = true;
   } catch(e) {
-    console.error(e);
+    console.error('BPMN Error:', e.message);
     window.__bpmnError = e.message;
   }
 })();
@@ -53,7 +94,12 @@ async function main() {
   });
 
   const page = await browser.newPage();
-  await page.setViewport({ width: 1500, height: 1000 });
+  await page.setViewport({ width: 1600, height: 1000 });
+
+  // Capture console logs
+  page.on('console', msg => {
+    if (msg.type() === 'error') console.log('Browser error:', msg.text());
+  });
 
   console.log('Loading BPMN diagram...');
   await page.goto(`data:text/html,${encodeURIComponent(html)}`, { waitUntil: 'networkidle0', timeout: 30000 });
@@ -67,7 +113,13 @@ async function main() {
     process.exit(1);
   }
 
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 3000));
+
+  // Check if arrows exist
+  const arrowCount = await page.evaluate(() => {
+    return document.querySelectorAll('.djs-connection').length;
+  });
+  console.log(`Found ${arrowCount} connections/flows`);
 
   console.log('Taking screenshot...');
   const canvasEl = await page.$('#canvas');

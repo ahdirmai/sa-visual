@@ -6,24 +6,21 @@
   id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
 
   <process id="ProcurementProcess" isExecutable="false" name="Sistem Informasi Pengadaan Barang">
-
-    <!-- POOLS & LANES -->
     <laneSet id="LaneSet_1">
       <lane id="Lane_Pemohon" name="Unit Pemohon">
         <flowNodeRef>StartEvent_1</flowNodeRef>
         <flowNodeRef>Task_Input</flowNodeRef>
         <flowNodeRef>Task_Notif_Ditolak</flowNodeRef>
-        <flowNodeRef>Task_Notif_Tolak_Anggaran</flowNodeRef>
-        <flowNodeRef>EndEvent_1</flowNodeRef>
+        <flowNodeRef>Task_Notif_Anggaran</flowNodeRef>
+        <flowNodeRef>EndEvent_Ditolak</flowNodeRef>
       </lane>
       <lane id="Lane_Procurement" name="Procurement">
         <flowNodeRef>Task_Validasi</flowNodeRef>
         <flowNodeRef>GW_Validasi</flowNodeRef>
-        <flowNodeRef>Task_Verifikasi_Anggaran</flowNodeRef>
         <flowNodeRef>Task_Kirim_PO</flowNodeRef>
-        <flowNodeRef>Task_Input_Kontrak</flowNodeRef>
         <flowNodeRef>Task_Terima_Barang</flowNodeRef>
-        <flowNodeRef>Task_Teruskan_Tagihan</flowNodeRef>
+        <flowNodeRef>Task_Input_Kontrak</flowNodeRef>
+        <flowNodeRef>Task_Teruskan</flowNodeRef>
       </lane>
       <lane id="Lane_Budgeting" name="Budgeting">
         <flowNodeRef>Task_Cek_Anggaran</flowNodeRef>
@@ -38,189 +35,289 @@
         <flowNodeRef>Task_Notif_Kasir</flowNodeRef>
       </lane>
       <lane id="Lane_Kasir" name="Kasir">
-        <flowNodeRef>Task_Cairkan_Dana</flowNodeRef>
-        <flowNodeRef>EndEvent_2</flowNodeRef>
+        <flowNodeRef>Task_Cairkan</flowNodeRef>
+        <flowNodeRef>EndEvent_Selesai</flowNodeRef>
       </lane>
     </laneSet>
 
-    <!-- EVENTS -->
-    <startEvent id="StartEvent_1" name="Mulai">
-      <outgoing>Flow_1</outgoing>
-    </startEvent>
-    <endEvent id="EndEvent_1" name="Selesai (Ditolak)">
-      <incoming>Flow_14</incoming>
-      <incoming>Flow_15</incoming>
-    </endEvent>
-    <endEvent id="EndEvent_2" name="Selesai">
-      <incoming>Flow_13</incoming>
-    </endEvent>
+    <startEvent id="StartEvent_1" name="Mulai"><outgoing>F1</outgoing></startEvent>
+    <endEvent id="EndEvent_Ditolak" name="Selesai"><incoming>F14</incoming><incoming>F15</incoming></endEvent>
+    <endEvent id="EndEvent_Selesai" name="Selesai"><incoming>F13</incoming></endEvent>
 
-    <!-- TASKS -->
-    <task id="Task_Input" name="Input Permintaan&#10;Barang">
-      <incoming>Flow_1</incoming>
-      <outgoing>Flow_2</outgoing>
-    </task>
-    <task id="Task_Validasi" name="Validasi&#10;Kebutuhan">
-      <incoming>Flow_2</incoming>
-      <outgoing>Flow_3</outgoing>
-    </task>
-    <exclusiveGateway id="GW_Validasi" name="Disetujui?">
-      <incoming>Flow_3</incoming>
-      <outgoing>Flow_4</outgoing>
-      <outgoing>Flow_5</outgoing>
-    </exclusiveGateway>
-    <task id="Task_Cek_Anggaran" name="Verifikasi&#10;Anggaran">
-      <incoming>Flow_4</incoming>
-      <outgoing>Flow_6</outgoing>
-    </task>
-    <exclusiveGateway id="GW_Anggaran" name="Anggaran&#10;Tersedia?">
-      <incoming>Flow_6</incoming>
-      <outgoing>Flow_7</outgoing>
-      <outgoing>Flow_8</outgoing>
-    </exclusiveGateway>
-    <task id="Task_Kirim_PO" name="Kirim Draft PO&#10;ke Supplier">
-      <incoming>Flow_7</incoming>
-      <outgoing>Flow_9</outgoing>
-    </task>
-    <task id="Task_Terima_PO" name="Terima PO &amp;&#10;Proses Pesanan">
-      <incoming>Flow_9</incoming>
-      <outgoing>Flow_10</outgoing>
-    </task>
-    <task id="Task_Kirim_Barang" name="Kirim Barang +&#10;Tagihan">
-      <incoming>Flow_10</incoming>
-      <outgoing>Flow_11</outgoing>
-    </task>
-    <task id="Task_Terima_Barang" name="Terima Barang &amp;&#10;Verifikasi">
-      <incoming>Flow_11</incoming>
-      <outgoing>Flow_16</outgoing>
-    </task>
-    <task id="Task_Input_Kontrak" name="Input Kontrak &amp;&#10;Termin Pembayaran">
-      <incoming>Flow_16</incoming>
-      <outgoing>Flow_17</outgoing>
-    </task>
-    <task id="Task_Teruskan_Tagihan" name="Teruskan Tagihan&#10;ke Keuangan">
-      <incoming>Flow_17</incoming>
-      <outgoing>Flow_18</outgoing>
-    </task>
-    <task id="Task_Input_Tagihan" name="Input Data Tagihan +&#10;Upload Berkas">
-      <incoming>Flow_18</incoming>
-      <outgoing>Flow_19</outgoing>
-    </task>
-    <task id="Task_Notif_Kasir" name="Notifikasi Pencairan&#10;ke Kasir">
-      <incoming>Flow_19</incoming>
-      <outgoing>Flow_12</outgoing>
-    </task>
-    <task id="Task_Cairkan_Dana" name="Cairkan Dana&#10;Pembayaran">
-      <incoming>Flow_12</incoming>
-      <outgoing>Flow_13</outgoing>
-    </task>
-    <task id="Task_Notif_Ditolak" name="Notifikasi&#10;Penolakan">
-      <incoming>Flow_5</incoming>
-      <outgoing>Flow_14</outgoing>
-    </task>
-    <task id="Task_Notif_Tolak_Anggaran" name="Notifikasi&#10;Anggaran Tidak Tersedia">
-      <incoming>Flow_8</incoming>
-      <outgoing>Flow_15</outgoing>
-    </task>
+    <task id="Task_Input" name="Input Permintaan Barang"><incoming>F1</incoming><outgoing>F2</outgoing></task>
+    <task id="Task_Validasi" name="Validasi Kebutuhan"><incoming>F2</incoming><outgoing>F3</outgoing></task>
+    <exclusiveGateway id="GW_Validasi" name="Disetujui?"><incoming>F3</incoming><outgoing>F4a</outgoing><outgoing>F4b</outgoing></exclusiveGateway>
+    <task id="Task_Notif_Ditolak" name="Notifikasi Penolakan"><incoming>F4b</incoming><outgoing>F14</outgoing></task>
+    <task id="Task_Cek_Anggaran" name="Verifikasi Anggaran"><incoming>F4a</incoming><outgoing>F5</outgoing></task>
+    <exclusiveGateway id="GW_Anggaran" name="Anggaran Tersedia?"><incoming>F5</incoming><outgoing>F6a</outgoing><outgoing>F6b</outgoing></exclusiveGateway>
+    <task id="Task_Notif_Anggaran" name="Notifikasi Anggaran Tidak Tersedia"><incoming>F6b</incoming><outgoing>F15</outgoing></task>
+    <task id="Task_Kirim_PO" name="Kirim Draft PO ke Supplier"><incoming>F6a</incoming><outgoing>F7</outgoing></task>
+    <task id="Task_Terima_PO" name="Terima PO &amp; Proses Pesanan"><incoming>F7</incoming><outgoing>F8</outgoing></task>
+    <task id="Task_Kirim_Barang" name="Kirim Barang + Tagihan"><incoming>F8</incoming><outgoing>F9</outgoing></task>
+    <task id="Task_Terima_Barang" name="Terima Barang &amp; Verifikasi"><incoming>F9</incoming><outgoing>F10</outgoing></task>
+    <task id="Task_Input_Kontrak" name="Input Kontrak &amp; Termin"><incoming>F10</incoming><outgoing>F11</outgoing></task>
+    <task id="Task_Teruskan" name="Teruskan Tagihan ke Keuangan"><incoming>F11</incoming><outgoing>F12</outgoing></task>
+    <task id="Task_Input_Tagihan" name="Input Data Tagihan + Upload Berkas"><incoming>F12</incoming><outgoing>F16</outgoing></task>
+    <task id="Task_Notif_Kasir" name="Notifikasi Pencairan ke Kasir"><incoming>F16</incoming><outgoing>F17</outgoing></task>
+    <task id="Task_Cairkan" name="Cairkan Dana Pembayaran"><incoming>F17</incoming><outgoing>F13</outgoing></task>
 
-    <!-- SEQUENCE FLOWS -->
-    <sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_Input" />
-    <sequenceFlow id="Flow_2" sourceRef="Task_Input" targetRef="Task_Validasi" />
-    <sequenceFlow id="Flow_3" sourceRef="Task_Validasi" targetRef="GW_Validasi" />
-    <sequenceFlow id="Flow_4" name="Ya" sourceRef="GW_Validasi" targetRef="Task_Cek_Anggaran" />
-    <sequenceFlow id="Flow_5" name="Tidak" sourceRef="GW_Validasi" targetRef="Task_Notif_Ditolak" />
-    <sequenceFlow id="Flow_6" sourceRef="Task_Cek_Anggaran" targetRef="GW_Anggaran" />
-    <sequenceFlow id="Flow_7" name="Tersedia" sourceRef="GW_Anggaran" targetRef="Task_Kirim_PO" />
-    <sequenceFlow id="Flow_8" name="Tidak" sourceRef="GW_Anggaran" targetRef="Task_Notif_Tolak_Anggaran" />
-    <sequenceFlow id="Flow_9" sourceRef="Task_Kirim_PO" targetRef="Task_Terima_PO" />
-    <sequenceFlow id="Flow_10" sourceRef="Task_Terima_PO" targetRef="Task_Kirim_Barang" />
-    <sequenceFlow id="Flow_11" sourceRef="Task_Kirim_Barang" targetRef="Task_Terima_Barang" />
-    <sequenceFlow id="Flow_12" sourceRef="Task_Notif_Kasir" targetRef="Task_Cairkan_Dana" />
-    <sequenceFlow id="Flow_13" sourceRef="Task_Cairkan_Dana" targetRef="EndEvent_2" />
-    <sequenceFlow id="Flow_14" sourceRef="Task_Notif_Ditolak" targetRef="EndEvent_1" />
-    <sequenceFlow id="Flow_15" sourceRef="Task_Notif_Tolak_Anggaran" targetRef="EndEvent_1" />
-    <sequenceFlow id="Flow_16" sourceRef="Task_Terima_Barang" targetRef="Task_Input_Kontrak" />
-    <sequenceFlow id="Flow_17" sourceRef="Task_Input_Kontrak" targetRef="Task_Teruskan_Tagihan" />
-    <sequenceFlow id="Flow_18" sourceRef="Task_Teruskan_Tagihan" targetRef="Task_Input_Tagihan" />
-    <sequenceFlow id="Flow_19" sourceRef="Task_Input_Tagihan" targetRef="Task_Notif_Kasir" />
+    <sequenceFlow id="F1" sourceRef="StartEvent_1" targetRef="Task_Input" />
+    <sequenceFlow id="F2" sourceRef="Task_Input" targetRef="Task_Validasi" />
+    <sequenceFlow id="F3" sourceRef="Task_Validasi" targetRef="GW_Validasi" />
+    <sequenceFlow id="F4a" name="Ya" sourceRef="GW_Validasi" targetRef="Task_Cek_Anggaran" />
+    <sequenceFlow id="F4b" name="Tidak" sourceRef="GW_Validasi" targetRef="Task_Notif_Ditolak" />
+    <sequenceFlow id="F5" sourceRef="Task_Cek_Anggaran" targetRef="GW_Anggaran" />
+    <sequenceFlow id="F6a" name="Tersedia" sourceRef="GW_Anggaran" targetRef="Task_Kirim_PO" />
+    <sequenceFlow id="F6b" name="Tidak" sourceRef="GW_Anggaran" targetRef="Task_Notif_Anggaran" />
+    <sequenceFlow id="F7" sourceRef="Task_Kirim_PO" targetRef="Task_Terima_PO" />
+    <sequenceFlow id="F8" sourceRef="Task_Terima_PO" targetRef="Task_Kirim_Barang" />
+    <sequenceFlow id="F9" sourceRef="Task_Kirim_Barang" targetRef="Task_Terima_Barang" />
+    <sequenceFlow id="F10" sourceRef="Task_Terima_Barang" targetRef="Task_Input_Kontrak" />
+    <sequenceFlow id="F11" sourceRef="Task_Input_Kontrak" targetRef="Task_Teruskan" />
+    <sequenceFlow id="F12" sourceRef="Task_Teruskan" targetRef="Task_Input_Tagihan" />
+    <sequenceFlow id="F13" sourceRef="Task_Cairkan" targetRef="EndEvent_Selesai" />
+    <sequenceFlow id="F14" sourceRef="Task_Notif_Ditolak" targetRef="EndEvent_Ditolak" />
+    <sequenceFlow id="F15" sourceRef="Task_Notif_Anggaran" targetRef="EndEvent_Ditolak" />
+    <sequenceFlow id="F16" sourceRef="Task_Input_Tagihan" targetRef="Task_Notif_Kasir" />
+    <sequenceFlow id="F17" sourceRef="Task_Notif_Kasir" targetRef="Task_Cairkan" />
   </process>
 
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ProcurementProcess">
+
+      <!-- POOLS / LANES -->
       <bpmndi:BPMNShape id="Lane_Pemohon_di" bpmnElement="Lane_Pemohon" isHorizontal="true">
-        <dc:Bounds x="120" y="0" width="1200" height="140" />
+        <dc:Bounds x="120" y="0" width="1360" height="130" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Procurement_di" bpmnElement="Lane_Procurement" isHorizontal="true">
-        <dc:Bounds x="120" y="140" width="1200" height="160" />
+        <dc:Bounds x="120" y="130" width="1360" height="150" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Budgeting_di" bpmnElement="Lane_Budgeting" isHorizontal="true">
-        <dc:Bounds x="120" y="300" width="1200" height="120" />
+        <dc:Bounds x="120" y="280" width="1360" height="130" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Supplier_di" bpmnElement="Lane_Supplier" isHorizontal="true">
-        <dc:Bounds x="120" y="420" width="1200" height="120" />
+        <dc:Bounds x="120" y="410" width="1360" height="130" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Keuangan_di" bpmnElement="Lane_Keuangan" isHorizontal="true">
-        <dc:Bounds x="120" y="540" width="1200" height="120" />
+        <dc:Bounds x="120" y="540" width="1360" height="130" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Kasir_di" bpmnElement="Lane_Kasir" isHorizontal="true">
-        <dc:Bounds x="120" y="660" width="1200" height="120" />
+        <dc:Bounds x="120" y="670" width="1360" height="120" />
       </bpmndi:BPMNShape>
 
+      <!-- UNIT PEMOHON LANE -->
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
-        <dc:Bounds x="152" y="42" width="36" height="36" />
-        <bpmndi:BPMNLabel><dc:Bounds x="155" y="85" width="30" height="14" /></bpmndi:BPMNLabel>
+        <dc:Bounds x="172" y="47" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_Input_di" bpmnElement="Task_Input">
-        <dc:Bounds x="230" y="30" width="100" height="60" />
+        <dc:Bounds x="260" y="35" width="130" height="60" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Notif_Ditolak_di" bpmnElement="Task_Notif_Ditolak">
+        <dc:Bounds x="600" y="35" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Notif_Anggaran_di" bpmnElement="Task_Notif_Anggaran">
+        <dc:Bounds x="890" y="35" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Ditolak_di" bpmnElement="EndEvent_Ditolak">
+        <dc:Bounds x="1112" y="47" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- PROCUREMENT LANE -->
       <bpmndi:BPMNShape id="Task_Validasi_di" bpmnElement="Task_Validasi">
-        <dc:Bounds x="380" y="160" width="100" height="60" />
+        <dc:Bounds x="440" y="155" width="130" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="GW_Validasi_di" bpmnElement="GW_Validasi" isMarkerVisible="true">
-        <dc:Bounds x="525" y="175" width="40" height="40" />
-        <bpmndi:BPMNLabel><dc:Bounds x="518" y="220" width="54" height="14" /></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_Cek_Anggaran_di" bpmnElement="Task_Cek_Anggaran">
-        <dc:Bounds x="610" y="320" width="100" height="60" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="GW_Anggaran_di" bpmnElement="GW_Anggaran" isMarkerVisible="true">
-        <dc:Bounds x="755" y="340" width="40" height="40" />
-        <bpmndi:BPMNLabel><dc:Bounds x="745" y="385" width="60" height="27" /></bpmndi:BPMNLabel>
+        <dc:Bounds x="625" y="165" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_Kirim_PO_di" bpmnElement="Task_Kirim_PO">
-        <dc:Bounds x="850" y="160" width="100" height="60" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_Terima_PO_di" bpmnElement="Task_Terima_PO">
-        <dc:Bounds x="850" y="440" width="100" height="60" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_Kirim_Barang_di" bpmnElement="Task_Kirim_Barang">
-        <dc:Bounds x="1000" y="440" width="100" height="60" />
+        <dc:Bounds x="890" y="155" width="160" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_Terima_Barang_di" bpmnElement="Task_Terima_Barang">
-        <dc:Bounds x="1000" y="160" width="100" height="60" />
+        <dc:Bounds x="1100" y="155" width="140" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_Input_Kontrak_di" bpmnElement="Task_Input_Kontrak">
-        <dc:Bounds x="1150" y="160" width="100" height="60" />
+        <dc:Bounds x="1290" y="155" width="140" height="60" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_Terusan_Tagihan_di" bpmnElement="Task_Terusan_Tagihan">
-        <dc:Bounds x="380" y="160" width="100" height="60" />
+      <bpmndi:BPMNShape id="Task_Teruskan_di" bpmnElement="Task_Teruskan">
+        <dc:Bounds x="260" y="155" width="130" height="60" />
       </bpmndi:BPMNShape>
+
+      <!-- BUDGETING LANE -->
+      <bpmndi:BPMNShape id="Task_Cek_Anggaran_di" bpmnElement="Task_Cek_Anggaran">
+        <dc:Bounds x="720" y="305" width="130" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Anggaran_di" bpmnElement="GW_Anggaran" isMarkerVisible="true">
+        <dc:Bounds x="905" y="315" width="40" height="40" />
+      </bpmndi:BPMNShape>
+
+      <!-- SUPPLIER LANE -->
+      <bpmndi:BPMNShape id="Task_Terima_PO_di" bpmnElement="Task_Terima_PO">
+        <dc:Bounds x="890" y="435" width="160" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Kirim_Barang_di" bpmnElement="Task_Kirim_Barang">
+        <dc:Bounds x="1100" y="435" width="140" height="60" />
+      </bpmndi:BPMNShape>
+
+      <!-- KEUANGAN LANE -->
       <bpmndi:BPMNShape id="Task_Input_Tagihan_di" bpmnElement="Task_Input_Tagihan">
-        <dc:Bounds x="380" y="560" width="100" height="60" />
+        <dc:Bounds x="300" y="565" width="180" height="60" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_Notif_Kasir_di" bpmnElement="Task_Notif_Kasir">
-        <dc:Bounds x="540" y="560" width="100" height="60" />
+        <dc:Bounds x="540" y="565" width="160" height="60" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_Cairkan_Dana_di" bpmnElement="Task_Cairkan_Dana">
-        <dc:Bounds x="540" y="690" width="100" height="60" />
+
+      <!-- KASIR LANE -->
+      <bpmndi:BPMNShape id="Task_Cairkan_di" bpmnElement="Task_Cairkan">
+        <dc:Bounds x="540" y="695" width="160" height="60" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
-        <dc:Bounds x="152" y="42" width="36" height="36" />
+      <bpmndi:BPMNShape id="EndEvent_Selesai_di" bpmnElement="EndEvent_Selesai">
+        <dc:Bounds x="762" y="707" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_2_di" bpmnElement="EndEvent_2">
-        <dc:Bounds x="700" y="702" width="36" height="36" />
-        <bpmndi:BPMNLabel><dc:Bounds x="693" y="745" width="50" height="14" /></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
+
+      <!-- ═══ SEQUENCE FLOW EDGES ═══ -->
+      
+      <!-- F1: Start → Input -->
+      <bpmndi:BPMNEdge id="F1_di" bpmnElement="F1">
+        <di:waypoint x="208" y="65" />
+        <di:waypoint x="260" y="65" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F2: Input → Validasi (cross lane down) -->
+      <bpmndi:BPMNEdge id="F2_di" bpmnElement="F2">
+        <di:waypoint x="325" y="95" />
+        <di:waypoint x="325" y="115" />
+        <di:waypoint x="505" y="115" />
+        <di:waypoint x="505" y="155" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F3: Validasi → GW_Validasi -->
+      <bpmndi:BPMNEdge id="F3_di" bpmnElement="F3">
+        <di:waypoint x="570" y="185" />
+        <di:waypoint x="625" y="185" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F4a: GW → Cek Anggaran (Ya, down to Budgeting) -->
+      <bpmndi:BPMNEdge id="F4a_di" bpmnElement="F4a">
+        <di:waypoint x="645" y="205" />
+        <di:waypoint x="645" y="260" />
+        <di:waypoint x="785" y="260" />
+        <di:waypoint x="785" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNLabel id="F4a_label">
+        <dc:Bounds x="650" y="240" width="20" height="14" />
+      </bpmndi:BPMNLabel>
+
+      <!-- F4b: GW → Notif Ditolak (up to Pemohon) -->
+      <bpmndi:BPMNEdge id="F4b_di" bpmnElement="F4b">
+        <di:waypoint x="645" y="165" />
+        <di:waypoint x="645" y="115" />
+        <di:waypoint x="665" y="115" />
+        <di:waypoint x="665" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNLabel id="F4b_label">
+        <dc:Bounds x="650" y="130" width="35" height="14" />
+      </bpmndi:BPMNLabel>
+
+      <!-- F5: Cek Anggaran → GW_Anggaran -->
+      <bpmndi:BPMNEdge id="F5_di" bpmnElement="F5">
+        <di:waypoint x="850" y="335" />
+        <di:waypoint x="905" y="335" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F6a: GW → Kirim PO (Tersedia, up to Procurement) -->
+      <bpmndi:BPMNEdge id="F6a_di" bpmnElement="F6a">
+        <di:waypoint x="925" y="315" />
+        <di:waypoint x="925" y="280" />
+        <di:waypoint x="970" y="280" />
+        <di:waypoint x="970" y="215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNLabel id="F6a_label">
+        <dc:Bounds x="930" y="260" width="55" height="14" />
+      </bpmndi:BPMNLabel>
+
+      <!-- F6b: GW → Notif Anggaran (Tidak, up to Pemohon) -->
+      <bpmndi:BPMNEdge id="F6b_di" bpmnElement="F6b">
+        <di:waypoint x="925" y="315" />
+        <di:waypoint x="925" y="115" />
+        <di:waypoint x="970" y="115" />
+        <di:waypoint x="970" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNLabel id="F6b_label">
+        <dc:Bounds x="930" y="130" width="35" height="14" />
+      </bpmndi:BPMNLabel>
+
+      <!-- F7: Kirim PO → Terima PO (down to Supplier) -->
+      <bpmndi:BPMNEdge id="F7_di" bpmnElement="F7">
+        <di:waypoint x="970" y="215" />
+        <di:waypoint x="970" y="435" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F8: Terima PO → Kirim Barang -->
+      <bpmndi:BPMNEdge id="F8_di" bpmnElement="F8">
+        <di:waypoint x="1050" y="465" />
+        <di:waypoint x="1100" y="465" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F9: Kirim Barang → Terima Barang (up to Procurement) -->
+      <bpmndi:BPMNEdge id="F9_di" bpmnElement="F9">
+        <di:waypoint x="1170" y="435" />
+        <di:waypoint x="1170" y="215" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F10: Terima Barang → Input Kontrak -->
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10">
+        <di:waypoint x="1240" y="185" />
+        <di:waypoint x="1290" y="185" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F11: Input Kontrak → Teruskan -->
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11">
+        <di:waypoint x="1360" y="185" />
+        <di:waypoint x="1420" y="185" />
+        <di:waypoint x="1420" y="115" />
+        <di:waypoint x="325" y="115" />
+        <di:waypoint x="325" y="155" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F12: Teruskan → Input Tagihan (down to Keuangan) -->
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12">
+        <di:waypoint x="325" y="215" />
+        <di:waypoint x="325" y="280" />
+        <di:waypoint x="200" y="280" />
+        <di:waypoint x="200" y="565" />
+        <di:waypoint x="300" y="595" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F16: Input Tagihan → Notif Kasir -->
+      <bpmndi:BPMNEdge id="F16_di" bpmnElement="F16">
+        <di:waypoint x="480" y="595" />
+        <di:waypoint x="540" y="595" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F17: Notif Kasir → Cairkan (down to Kasir) -->
+      <bpmndi:BPMNEdge id="F17_di" bpmnElement="F17">
+        <di:waypoint x="620" y="625" />
+        <di:waypoint x="620" y="695" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F13: Cairkan → End Selesai -->
+      <bpmndi:BPMNEdge id="F13_di" bpmnElement="F13">
+        <di:waypoint x="700" y="725" />
+        <di:waypoint x="762" y="725" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F14: Notif Ditolak → End Ditolak -->
+      <bpmndi:BPMNEdge id="F14_di" bpmnElement="F14">
+        <di:waypoint x="730" y="65" />
+        <di:waypoint x="1112" y="65" />
+      </bpmndi:BPMNEdge>
+
+      <!-- F15: Notif Anggaran → End Ditolak -->
+      <bpmndi:BPMNEdge id="F15_di" bpmnElement="F15">
+        <di:waypoint x="1050" y="65" />
+        <di:waypoint x="1112" y="65" />
+      </bpmndi:BPMNEdge>
+
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>
